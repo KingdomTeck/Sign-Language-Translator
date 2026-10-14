@@ -1,369 +1,283 @@
 import React, { useState, useEffect, useRef } from 'react';
-import {
-  Mic,
-  MicOff,
-  Send,
-  Trash2,
-  Download,
-  Copy,
-  Check,
-  Info,
-} from 'lucide-react';
+import { Mic, Square, ArrowUp, Trash2, Download, Copy, Check, Volume2, Hand } from 'lucide-react';
+import { Mascot } from './Mascot';
 import { TranscriptMessage, VoiceSettings } from '../types';
 import { speechRecognitionManager } from '../services/speechRecognition';
 import { speechManager, soundEffects } from '../services/speechSynthesis';
 import { findMatchingASLCue } from '../data/aslDictionary';
-import { AnimatedMic, AnimatedSpeaker } from './AnimatedIcons';
 
 interface TwoWayTranscriptProps {
   messages: TranscriptMessage[];
   onAddMessage: (msg: TranscriptMessage) => void;
   onClearMessages: () => void;
   voiceSettings: VoiceSettings;
+  isMuted?: boolean;
   highContrast: boolean;
 }
+
+const time = (ts: number) =>
+  new Date(ts).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
 
 export const TwoWayTranscript: React.FC<TwoWayTranscriptProps> = ({
   messages,
   onAddMessage,
   onClearMessages,
   voiceSettings,
-  highContrast,
+  isMuted = false,
 }) => {
   const [isListening, setIsListening] = useState(false);
   const [interimText, setInterimText] = useState('');
-  const [partnerTextInput, setPartnerTextInput] = useState('');
+  const [draft, setDraft] = useState('');
   const [micError, setMicError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const [confirmClear, setConfirmClear] = useState(false);
+  const threadRef = useRef<HTMLDivElement | null>(null);
 
-  // Auto scroll to bottom of messages
+  const visible = messages.filter((m) => m.role !== 'system');
+
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, interimText]);
+    const el = threadRef.current;
+    if (el) el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' });
+  }, [visible.length, interimText]);
 
-  // Toggle microphone for hearing partner
+  useEffect(() => {
+    if (!confirmClear) return;
+    const t = setTimeout(() => setConfirmClear(false), 3000);
+    return () => clearTimeout(t);
+  }, [confirmClear]);
+
+  const addPartnerMessage = (text: string) => {
+    const cue = findMatchingASLCue(text);
+    onAddMessage({
+      id: `partner_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+      role: 'partner',
+      text,
+      timestamp: Date.now(),
+      aslCue: cue?.name,
+    });
+  };
+
   const toggleListening = () => {
     setMicError(null);
-
     if (isListening) {
       speechRecognitionManager.stop();
       setIsListening(false);
       setInterimText('');
-    } else {
-      const started = speechRecognitionManager.start({
-        onInterimResult: (text) => {
-          setInterimText(text);
-        },
-        onFinalResult: (text) => {
-          setInterimText('');
-          if (text.trim()) {
-            handleNewPartnerMessage(text.trim());
-          }
-        },
-        onError: (err) => {
-          setMicError(err);
-          setIsListening(false);
-        },
-        onStateChange: (listening) => {
-          setIsListening(listening);
-        },
-      });
-
-      if (!started) {
-        setMicError('Speech recognition could not be started in this browser.');
-      } else {
-        if (voiceSettings.soundEffects) {
-          soundEffects.playPartnerChime();
-        }
-      }
+      return;
+    }
+    const started = speechRecognitionManager.start({
+      onInterimResult: setInterimText,
+      onFinalResult: (text) => {
+        setInterimText('');
+        if (text.trim()) addPartnerMessage(text.trim());
+      },
+      onError: (err) => {
+        setMicError(err);
+        setIsListening(false);
+      },
+      onStateChange: setIsListening,
+    });
+    if (!started) {
+      setMicError('This browser can’t listen for speech. Type the reply instead.');
+    } else if (voiceSettings.soundEffects) {
+      soundEffects.playPartnerChime();
     }
   };
 
-  // Add partner message to transcript and detect ASL cues
-  const handleNewPartnerMessage = (text: string) => {
-    const cue = findMatchingASLCue(text);
-
-    const newMsg: TranscriptMessage = {
-      id: `partner_${Date.now()}_${Math.random().toString(36).substr(2, 4)}`,
-      role: 'partner',
-      text: text,
-      timestamp: Date.now(),
-      aslCue: cue?.name,
-    };
-
-    onAddMessage(newMsg);
-  };
-
-  // Manual partner text submission
-  const handlePartnerSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!partnerTextInput.trim()) return;
-    handleNewPartnerMessage(partnerTextInput.trim());
-    setPartnerTextInput('');
+    if (!draft.trim()) return;
+    addPartnerMessage(draft.trim());
+    setDraft('');
   };
 
-  // Copy transcript to clipboard
-  const handleCopyTranscript = () => {
-    const text = messages
-      .map(
-        (m) =>
-          `[${new Date(m.timestamp).toLocaleTimeString([], {
-            hour: '2-digit',
-            minute: '2-digit',
-          })}] ${m.role === 'signer' ? 'Signer (Camera/Voice)' : 'Partner (Spoken/Text)'}: ${m.text}`
-      )
-      .join('\n');
+  const transcriptText = (sep: string) =>
+    visible
+      .map((m) => `[${time(m.timestamp)}] ${m.role === 'signer' ? 'Signer' : 'Partner'}: ${m.text}`)
+      .join(sep);
 
-    navigator.clipboard.writeText(text);
+  const handleCopy = () => {
+    navigator.clipboard.writeText(transcriptText('\n'));
     setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    setTimeout(() => setCopied(false), 1800);
   };
 
-  // Download transcript as file
-  const handleDownloadTranscript = () => {
-    const text = messages
-      .map(
-        (m) =>
-          `[${new Date(m.timestamp).toLocaleTimeString()}] ${
-            m.role === 'signer' ? 'Signer' : 'Partner'
-          }: ${m.text}`
-      )
-      .join('\n\n');
-
-    const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+  const handleDownload = () => {
+    const blob = new Blob([transcriptText('\n\n')], { type: 'text/plain;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `GestureVoice_Transcript_${new Date().toISOString().slice(0, 10)}.txt`;
+    link.download = `conversation-${new Date().toISOString().slice(0, 10)}.txt`;
     link.click();
     URL.revokeObjectURL(url);
   };
 
+  const handleClear = () => {
+    if (!confirmClear) {
+      setConfirmClear(true);
+      return;
+    }
+    setConfirmClear(false);
+    onClearMessages();
+  };
+
   return (
-    <div className="flex flex-col gap-6 w-full max-w-4xl mx-auto">
-      {/* Partner Voice Response Screen (Liquid Glass + Siri-Inspired Dictation) */}
-      <div className="w-full rounded-3xl liquid-glass-card uiverse-edge-sheen border border-white/[0.08] p-6 sm:p-7 relative overflow-hidden flex flex-col gap-5">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
-
-        <div className="flex items-center justify-between relative z-10">
-          <div className="flex items-center gap-2">
-            <AnimatedMic className="w-4 h-4 text-sky-400" active={isListening} />
-            <h2 className="text-sm font-semibold text-white tracking-tight">
-              Hearing Partner Voice Reply
-            </h2>
+    <div className="sheet h-full min-h-[560px] flex flex-col overflow-hidden">
+      {/* Panel header */}
+      <div className="flex items-center justify-between gap-3 pl-5 pr-2 h-16 border-b-2 border-rule shrink-0">
+        <h2 className="text-[1.25rem] font-black">Conversation</h2>
+        {visible.length > 0 && (
+          <div className="flex items-center">
+            <button onClick={handleCopy} className="icon-btn" aria-label="Copy conversation" title="Copy">
+              {copied ? <Check className="w-5 h-5 text-signer" strokeWidth={3} /> : <Copy className="w-5 h-5" strokeWidth={2.5} />}
+            </button>
+            <button onClick={handleDownload} className="icon-btn" aria-label="Download conversation" title="Download .txt">
+              <Download className="w-5 h-5" strokeWidth={2.5} />
+            </button>
+            <button
+              onClick={handleClear}
+              className={confirmClear ? 'btn btn-sm btn-danger' : 'icon-btn'}
+              aria-label="Clear conversation"
+              title="Clear"
+            >
+              {confirmClear ? 'Clear all?' : <Trash2 className="w-5 h-5" strokeWidth={2.5} />}
+            </button>
           </div>
-          <span className="text-xs text-slate-400 font-medium">
-            Live speech transcription for the signer
-          </span>
-        </div>
-
-        {/* Primary Mic Trigger & Large Transcript Area */}
-        <div className="flex flex-col items-center justify-center py-8 px-4 rounded-3xl bg-white/[0.03] border border-white/[0.06] text-center gap-4 relative z-10">
-          <button
-            onClick={toggleListening}
-            className={`w-18 h-18 rounded-full flex items-center justify-center transition-all duration-200 cursor-pointer ${
-              isListening
-                ? 'bg-rose-500 text-white shadow-[0_0_35px_rgba(244,63,94,0.6)] ring-8 ring-rose-500/25 uiverse-neon-pulse'
-                : 'uiverse-glow-btn bg-gradient-to-tr from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white shadow-[0_4px_24px_rgba(14,165,233,0.4)] ring-4 ring-sky-500/10'
-            }`}
-            title={isListening ? 'Stop listening' : 'Start microphone listening'}
-          >
-            {isListening ? <MicOff className="w-7 h-7" /> : <Mic className="w-7 h-7" />}
-          </button>
-
-          <div className="flex flex-col items-center gap-1.5">
-            <div className="text-base font-semibold text-white tracking-[-0.01em]">
-              {isListening ? 'Listening to speech...' : 'Tap to Speak Reply'}
-            </div>
-
-            {/* UIverse Audio Wave Bars when listening */}
-            {isListening && (
-              <div className="flex items-center gap-1 h-5 my-1">
-                <span className="uiverse-wave-bar bg-rose-400" style={{ animationDelay: '0.0s' }} />
-                <span className="uiverse-wave-bar bg-rose-400" style={{ animationDelay: '0.15s' }} />
-                <span className="uiverse-wave-bar bg-rose-300" style={{ animationDelay: '0.3s' }} />
-                <span className="uiverse-wave-bar bg-rose-400" style={{ animationDelay: '0.45s' }} />
-                <span className="uiverse-wave-bar bg-rose-300" style={{ animationDelay: '0.2s' }} />
-              </div>
-            )}
-
-            <p className="text-xs text-slate-400 max-w-sm">
-              {isListening
-                ? 'Speak naturally. Your words will appear live in large high-contrast text below.'
-                : 'Transcribes non-signer speech into large readable text in real-time.'}
-            </p>
-          </div>
-
-          {/* Live Interim Transcript (Super Large for High Readability) */}
-          {interimText && (
-            <div className="w-full p-5 rounded-2xl bg-sky-500/15 border border-sky-400/30 text-center animate-pulse">
-              <span className="text-[10px] text-sky-300 font-semibold uppercase tracking-wider block mb-1">
-                Live Speech Detected
-              </span>
-              <p className="text-2xl sm:text-3xl font-bold text-white tracking-[-0.02em] leading-relaxed">
-                "{interimText}"
-              </p>
-            </div>
-          )}
-
-          {micError && (
-            <div className="text-xs text-rose-300 bg-rose-500/15 border border-rose-500/30 px-3.5 py-2 rounded-xl">
-              {micError}
-            </div>
-          )}
-        </div>
-
-        {/* Fallback Text Input for Partner (Quiet/Noisy spaces) */}
-        <form onSubmit={handlePartnerSubmit} className="flex items-center gap-2 relative z-10">
-          <input
-            type="text"
-            value={partnerTextInput}
-            onChange={(e) => setPartnerTextInput(e.target.value)}
-            placeholder="Or type a quick response here..."
-            className="flex-1 bg-white/[0.04] border border-white/[0.08] focus:border-sky-400/50 rounded-2xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none transition-colors"
-          />
-          <button
-            type="submit"
-            disabled={!partnerTextInput.trim()}
-            className="uiverse-glow-btn px-5 py-3 rounded-2xl bg-sky-500 hover:bg-sky-400 disabled:opacity-40 text-white text-xs font-semibold transition-all flex items-center gap-2 cursor-pointer shadow-[0_2px_12px_rgba(14,165,233,0.3)]"
-          >
-            <Send className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Send</span>
-          </button>
-        </form>
+        )}
       </div>
 
-      {/* Two-Way Conversation Transcript History (Apple Messages Style) */}
-      <div className="w-full rounded-3xl liquid-glass-card border border-white/[0.08] p-6 sm:p-7 shadow-xl flex flex-col gap-4">
-        <div className="flex items-center justify-between pb-3 border-b border-white/[0.06]">
-          <div className="flex items-center gap-2.5">
-            <h3 className="text-sm font-semibold text-white tracking-[-0.01em]">
-              Conversation History
-            </h3>
-            <span className="text-xs text-slate-400 font-mono">
-              ({messages.length} messages)
-            </span>
-          </div>
-
-          <div className="flex items-center gap-1.5">
-            <button
-              onClick={handleCopyTranscript}
-              disabled={messages.length === 0}
-              className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-white/[0.06] transition-all disabled:opacity-30 apple-press cursor-pointer"
-              title="Copy transcript to clipboard"
-            >
-              {copied ? (
-                <Check className="w-4 h-4 text-emerald-400" />
-              ) : (
-                <Copy className="w-4 h-4" />
-              )}
-            </button>
-
-            <button
-              onClick={handleDownloadTranscript}
-              disabled={messages.length === 0}
-              className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-white/[0.06] transition-all disabled:opacity-30 apple-press cursor-pointer"
-              title="Download transcript file (.txt)"
-            >
-              <Download className="w-4 h-4" />
-            </button>
-
-            <button
-              onClick={onClearMessages}
-              disabled={messages.length === 0}
-              className="p-2 rounded-xl text-slate-400 hover:text-rose-400 hover:bg-white/[0.06] transition-all disabled:opacity-30 apple-press cursor-pointer"
-              title="Clear transcript history"
-            >
-              <Trash2 className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-
-        {/* Chronological Chat Messages with Zero-Pill Typography */}
-        <div className="flex flex-col gap-3.5 max-h-[500px] overflow-y-auto pr-1">
-          {messages.length === 0 ? (
-            <div className="py-14 text-center text-slate-400 text-xs flex flex-col items-center gap-2">
-              <Info className="w-7 h-7 text-slate-500" />
-              <span className="font-medium text-slate-300">No conversation messages yet.</span>
-              <span>Use camera to sign or speak into the microphone to start talking.</span>
+      {/* Thread */}
+      <div ref={threadRef} className="flex-1 overflow-y-auto scroll-quiet px-4 sm:px-5 py-5" aria-live="polite">
+        {visible.length === 0 && !interimText ? (
+          <div className="h-full flex flex-col justify-center gap-6 py-8">
+            <div className="flex items-center gap-4">
+              <Mascot size={64} className="bob shrink-0" />
+              <div className="bubble font-extrabold">Nothing said yet. Here’s how it works:</div>
             </div>
-          ) : (
-            messages.map((msg) => {
-              const isSigner = msg.role === 'signer';
-              const matchedCue = msg.aslCue ? findMatchingASLCue(msg.aslCue) : null;
-
+            <div className="grid grid-cols-2 gap-3">
+              <div className="tile p-4">
+                <span className="inline-flex w-10 h-10 rounded-xl bg-signer-soft items-center justify-center">
+                  <Hand className="w-6 h-6 text-signer-ink" strokeWidth={2.5} />
+                </span>
+                <p className="mt-3 font-black">Signs → speech</p>
+                <p className="text-sm font-bold text-ink-2 mt-0.5">Each sign is spoken aloud and written here.</p>
+              </div>
+              <div className="tile p-4">
+                <span className="inline-flex w-10 h-10 rounded-xl bg-partner-soft items-center justify-center">
+                  <Mic className="w-6 h-6 text-partner-ink" strokeWidth={2.5} />
+                </span>
+                <p className="mt-3 font-black">Speech → text</p>
+                <p className="text-sm font-bold text-ink-2 mt-0.5">Replies show up big, easy to read across a table.</p>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <ol className="flex flex-col gap-5">
+            {visible.map((m, i) => {
+              const isSigner = m.role === 'signer';
+              const isLast = i === visible.length - 1;
               return (
-                <div
-                  key={msg.id}
-                  className={`flex flex-col p-5 rounded-3xl border transition-all ${
-                    isSigner
-                      ? 'bg-emerald-500/10 border-emerald-500/25 ml-0 mr-4 sm:mr-12'
-                      : 'bg-sky-500/10 border-sky-500/25 ml-4 sm:ml-12 mr-0'
-                  }`}
-                >
-                  <div className="flex items-center justify-between text-[11px] mb-2">
-                    <div className="flex items-center gap-2 text-[11px]">
-                      <span
-                        className={`font-semibold uppercase tracking-wider text-[10px] ${
-                          isSigner ? 'text-emerald-400' : 'text-sky-300'
-                        }`}
+                <li key={m.id} className={`arrive flex items-end gap-2.5 ${isSigner ? '' : 'flex-row-reverse'}`}>
+                  {isSigner ? (
+                    <Mascot size={36} className="shrink-0 mb-1" />
+                  ) : (
+                    <span className="shrink-0 mb-1 w-9 h-9 rounded-full bg-partner text-white inline-flex items-center justify-center" aria-hidden="true">
+                      <Mic className="w-5 h-5" strokeWidth={2.5} />
+                    </span>
+                  )}
+                  <div className={`min-w-0 max-w-[85%] flex flex-col ${isSigner ? 'items-start' : 'items-end'}`}>
+                    <div className={`flex items-baseline gap-2 text-xs font-extrabold uppercase tracking-wider mb-1 px-1 ${isSigner ? '' : 'flex-row-reverse'}`}>
+                      <span className={isSigner ? 'text-signer-ink' : 'text-partner-ink'}>{isSigner ? 'Signer' : 'Partner'}</span>
+                      <span className="text-ink-3 tnum normal-case tracking-normal font-bold">{time(m.timestamp)}</span>
+                    </div>
+                    <div
+                      className={`group relative rounded-2xl border-2 border-b-4 px-4 py-3 ${
+                        isSigner
+                          ? 'bg-sheet border-rule rounded-bl-md'
+                          : 'bg-partner-soft border-[var(--partner-line)] rounded-br-md'
+                      }`}
+                    >
+                      <p
+                        className={`said ${
+                          isSigner ? (isLast ? 'text-[1.375rem]' : 'text-[1.125rem]') : isLast ? 'text-[1.75rem]' : 'text-[1.25rem]'
+                        } text-ink`}
                       >
-                        {isSigner ? 'Signer (ASL → Voice)' : 'Hearing Partner (Voice → Text)'}
-                      </span>
-                      {msg.gestureName && (
-                        <>
-                          <span aria-hidden="true" className="text-slate-600">·</span>
-                          <span className="font-mono text-emerald-300 font-medium">
-                            {msg.gestureName}
-                          </span>
-                        </>
+                        {m.text}
+                      </p>
+                      {isSigner && m.gestureName && (
+                        <p className="text-sm font-bold text-ink-3 mt-1">
+                          signed “{m.gestureName}”
+                          {m.source === 'offline' && <span className="text-coral"> · offline guess</span>}
+                        </p>
+                      )}
+                      {!isSigner && m.aslCue && (
+                        <p className="text-sm font-bold text-partner-ink mt-1">Related sign: {m.aslCue}</p>
                       )}
                     </div>
-                    <span className="text-slate-400 font-mono text-[10px]">
-                      {new Date(msg.timestamp).toLocaleTimeString([], {
-                        hour: '2-digit',
-                        minute: '2-digit',
-                      })}
-                    </span>
                   </div>
-
-                  {/* Message Content */}
-                  <div className="flex items-start justify-between gap-3">
-                    <p className="text-base sm:text-lg font-medium text-white leading-relaxed">
-                      "{msg.text}"
-                    </p>
-
-                    {/* Replay voice button with AnimatedSpeaker */}
+                  {isSigner && (
                     <button
-                      onClick={() => speechManager.speak(msg.text, voiceSettings)}
-                      className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-white/[0.08] shrink-0 mt-0.5 apple-press transition-all cursor-pointer"
-                      title="Speak phrase aloud"
+                      onClick={() => !isMuted && speechManager.speak(m.text, voiceSettings)}
+                      className="icon-btn !w-9 !h-9 mb-1 text-partner-ink shrink-0"
+                      aria-label={`Say again: ${m.text}`}
+                      title="Say again"
                     >
-                      <AnimatedSpeaker className="w-4 h-4" />
+                      <Volume2 className="w-5 h-5" strokeWidth={2.5} />
                     </button>
-                  </div>
-
-                  {/* Matched ASL Visual Cue Card for Partner Speech */}
-                  {matchedCue && (
-                    <div className="mt-3 p-3 rounded-2xl bg-white/[0.05] border border-white/[0.08] flex items-center gap-3">
-                      <span className="text-2xl p-1 rounded-xl bg-white/[0.06]">{matchedCue.iconSymbol || '🤟'}</span>
-                      <div className="flex flex-col text-xs">
-                        <span className="font-semibold text-sky-200">
-                          ASL Reference: {matchedCue.name}
-                        </span>
-                        <span className="text-slate-300 text-[11px]">
-                          {matchedCue.handshape}
-                        </span>
-                      </div>
-                    </div>
                   )}
-                </div>
+                </li>
               );
-            })
-          )}
-          <div ref={messagesEndRef} />
-        </div>
+            })}
+            {interimText && (
+              <li className="flex items-end gap-2.5 flex-row-reverse">
+                <span className="shrink-0 mb-1 w-9 h-9 rounded-full bg-partner text-white inline-flex items-center justify-center">
+                  <span className="live-dot !bg-white" aria-hidden="true" />
+                </span>
+                <div className="max-w-[85%] rounded-2xl rounded-br-md border-2 border-dashed border-[var(--partner-line)] px-4 py-3">
+                  <p className="said text-[1.75rem] text-ink-2">{interimText}</p>
+                </div>
+              </li>
+            )}
+          </ol>
+        )}
+      </div>
+
+      {/* Partner reply */}
+      <div className="border-t-2 border-rule p-3 sm:p-4 shrink-0">
+        {micError && <p className="text-sm font-bold text-alert mb-2 px-1">{micError}</p>}
+        <form onSubmit={handleSubmit} className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={toggleListening}
+            className={`btn shrink-0 ${isListening ? 'btn-danger' : 'btn-partner'}`}
+            aria-pressed={isListening}
+          >
+            {isListening ? (
+              <>
+                <Square className="w-4 h-4 fill-current" /> Done
+              </>
+            ) : (
+              <>
+                <Mic className="w-5 h-5" strokeWidth={2.5} /> Reply
+              </>
+            )}
+          </button>
+          <label htmlFor="partner-reply" className="sr-only">
+            Type a reply
+          </label>
+          <input
+            id="partner-reply"
+            type="text"
+            value={draft}
+            onChange={(e) => setDraft(e.target.value)}
+            placeholder={isListening ? 'Listening…' : 'or type a reply'}
+            className="field"
+            autoComplete="off"
+          />
+          <button type="submit" disabled={!draft.trim()} className="btn btn-partner shrink-0 !px-0 w-12" aria-label="Send reply">
+            <ArrowUp className="w-5 h-5" strokeWidth={3} />
+          </button>
+        </form>
       </div>
     </div>
   );

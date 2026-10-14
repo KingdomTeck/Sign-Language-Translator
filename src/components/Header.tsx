@@ -1,201 +1,150 @@
 import React from 'react';
-import {
-  Volume2,
-  VolumeX,
-  Moon,
-  Sun,
-  Settings as SettingsIcon,
-} from 'lucide-react';
-import {
-  AnimatedCamera,
-  AnimatedVideo,
-  AnimatedMic,
-  AnimatedBook,
-  AnimatedHand,
-} from './AnimatedIcons';
+import { Mascot } from './Mascot';
+import { Volume2, VolumeX, Moon, Sun, SlidersHorizontal, Hand, Clapperboard, BookOpen } from 'lucide-react';
+
+export type AppView = 'converse' | 'video' | 'signs';
 
 interface HeaderProps {
-  activeTab: 'translate' | 'video' | 'conversation' | 'library' | 'settings';
-  setActiveTab: (tab: 'translate' | 'video' | 'conversation' | 'library' | 'settings') => void;
+  view: AppView;
+  setView: (view: AppView) => void;
   isMuted: boolean;
   toggleMute: () => void;
-  highContrast: boolean;
-  toggleHighContrast: () => void;
+  isDark: boolean;
+  toggleTheme: () => void;
   isSpeaking: boolean;
+  onOpenSettings: () => void;
 }
 
+const NAV: { id: AppView; label: string; icon: React.ElementType; tint: string }[] = [
+  { id: 'converse', label: 'Converse', icon: Hand, tint: 'var(--signer-edge)' },
+  { id: 'video', label: 'Video', icon: Clapperboard, tint: 'var(--sun)' },
+  { id: 'signs', label: 'Signs', icon: BookOpen, tint: 'var(--partner)' },
+];
+
+export const Wordmark: React.FC<{ small?: boolean }> = ({ small }) => (
+  <span className="inline-flex items-center gap-2 select-none">
+    <Mascot size={small ? 30 : 36} />
+    <span className={`${small ? 'text-[1.375rem]' : 'text-[1.625rem]'} leading-none font-black tracking-[-0.03em] text-ink`}>
+      gesture<span className="text-partner-ink">voice</span>
+    </span>
+  </span>
+);
+
+const SpeakingBadge: React.FC<{ on: boolean }> = ({ on }) => (
+  <span
+    aria-live="polite"
+    className={`inline-flex items-center gap-2 text-sm font-extrabold uppercase tracking-wider text-signer-ink transition-opacity ${
+      on ? 'opacity-100' : 'opacity-0'
+    }`}
+  >
+    <span className="speak-bars" aria-hidden="true">
+      <i />
+      <i />
+      <i />
+    </span>
+    {on ? 'Speaking' : ''}
+  </span>
+);
+
 export const Header: React.FC<HeaderProps> = ({
-  activeTab,
-  setActiveTab,
+  view,
+  setView,
   isMuted,
   toggleMute,
-  highContrast,
-  toggleHighContrast,
+  isDark,
+  toggleTheme,
   isSpeaking,
+  onOpenSettings,
 }) => {
-  const navItems = [
-    {
-      id: 'translate' as const,
-      label: 'Live Camera',
-      shortLabel: 'Camera',
-      icon: AnimatedCamera,
-      color: 'text-emerald-400',
-    },
-    {
-      id: 'video' as const,
-      label: 'Video File',
-      shortLabel: 'Video',
-      icon: AnimatedVideo,
-      color: 'text-purple-400',
-    },
-    {
-      id: 'conversation' as const,
-      label: 'Two-Way Voice',
-      shortLabel: 'Voice',
-      icon: AnimatedMic,
-      color: 'text-sky-400',
-    },
-    {
-      id: 'library' as const,
-      label: 'ASL Library',
-      shortLabel: 'Library',
-      icon: AnimatedBook,
-      color: 'text-amber-400',
-    },
-    {
-      id: 'settings' as const,
-      label: 'Settings',
-      shortLabel: 'Settings',
-      icon: SettingsIcon,
-      color: 'text-slate-300',
-    },
-  ];
+  const utilities = (
+    <>
+      <button
+        onClick={toggleMute}
+        className="icon-btn"
+        aria-pressed={isMuted}
+        aria-label={isMuted ? 'Unmute voice' : 'Mute voice'}
+        title={isMuted ? 'Voice is muted' : 'Mute voice'}
+      >
+        {isMuted ? <VolumeX className="w-5 h-5 text-alert" strokeWidth={2.5} /> : <Volume2 className="w-5 h-5" strokeWidth={2.5} />}
+      </button>
+      <button
+        onClick={toggleTheme}
+        className="icon-btn"
+        aria-label={isDark ? 'Use light theme' : 'Use dark theme'}
+        title={isDark ? 'Light theme' : 'Dark theme'}
+      >
+        {isDark ? <Sun className="w-5 h-5" strokeWidth={2.5} /> : <Moon className="w-5 h-5" strokeWidth={2.5} />}
+      </button>
+    </>
+  );
 
   return (
-    <header className="sticky top-0 z-40 w-full bg-slate-950/80 backdrop-blur-2xl backdrop-saturate-180 border-b border-white/[0.08] transition-all">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-2.5 flex items-center justify-between gap-6">
-        {/* Zone 1: Single Brand Wordmark adhering strictly to Top Bar Contract */}
-        <button
-          onClick={() => setActiveTab('translate')}
-          className="flex items-center gap-2.5 shrink-0 group text-left cursor-pointer focus:outline-none"
-        >
-          <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-500/20 to-cyan-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 group-hover:scale-105 transition-transform shadow-[0_0_12px_rgba(16,185,129,0.2)]">
-            <AnimatedHand className="w-4 h-4 text-emerald-400" active={isSpeaking} />
-          </div>
-          <span className="text-base font-bold tracking-tight text-white whitespace-nowrap">
-            GestureVoice
-          </span>
+    <>
+      {/* Desktop: left rail */}
+      <aside className="hidden lg:flex fixed inset-y-0 left-0 z-40 w-[248px] flex-col border-r-2 border-rule bg-paper px-4 py-7">
+        <button onClick={() => setView('converse')} className="px-4 mb-8 text-left" aria-label="GestureVoice home">
+          <Wordmark />
         </button>
-
-        {/* Zone 2: 4-5 Concise Single-Line Navigation Tabs */}
-        <nav className="hidden md:flex items-center p-1 rounded-2xl bg-white/[0.04] border border-white/[0.07] shadow-[inset_0_1px_1px_rgba(255,255,255,0.06)]">
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = activeTab === item.id;
-            return (
-              <button
-                key={item.id}
-                onClick={() => setActiveTab(item.id)}
-                className={`group relative flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-medium transition-all duration-150 whitespace-nowrap cursor-pointer apple-press ${
-                  isActive
-                    ? 'bg-white/[0.12] text-white shadow-[0_2px_8px_rgba(0,0,0,0.35)] border border-white/[0.12]'
-                    : 'text-slate-400 hover:text-slate-200 hover:bg-white/[0.04] border border-transparent'
-                }`}
-                title={item.label}
-              >
-                <Icon
-                  className={`w-3.5 h-3.5 ${isActive ? item.color : 'text-slate-400'}`}
-                  active={isActive}
-                />
-                <span className="whitespace-nowrap shrink-0">{item.label}</span>
-              </button>
-            );
-          })}
+        <nav aria-label="Primary" className="flex flex-col gap-2">
+          {NAV.map(({ id, label, icon: Icon, tint }) => (
+            <button
+              key={id}
+              onClick={() => setView(id)}
+              aria-current={view === id ? 'page' : undefined}
+              className="navitem"
+            >
+              <Icon className="w-7 h-7" strokeWidth={2.5} style={{ color: tint }} />
+              {label}
+            </button>
+          ))}
+          <button onClick={onOpenSettings} className="navitem">
+            <SlidersHorizontal className="w-7 h-7 text-ink-3" strokeWidth={2.5} />
+            Settings
+          </button>
         </nav>
-
-        {/* Zone 3: 1 Primary Action & Accessibility Controls */}
-        <div className="flex items-center gap-2 shrink-0">
-          {/* Audio Vocalizing Indicator */}
-          {isSpeaking && (
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs font-medium shadow-[0_0_16px_rgba(16,185,129,0.3)]">
-              <div className="flex items-center gap-0.5 h-3.5">
-                <span className="uiverse-wave-bar bg-emerald-400" style={{ animationDelay: '0.0s' }} />
-                <span className="uiverse-wave-bar bg-emerald-400" style={{ animationDelay: '0.2s' }} />
-                <span className="uiverse-wave-bar bg-emerald-300" style={{ animationDelay: '0.4s' }} />
-                <span className="uiverse-wave-bar bg-emerald-400" style={{ animationDelay: '0.1s' }} />
-              </div>
-              <span className="hidden xl:inline text-[11px] font-mono font-medium">Vocalizing</span>
-            </div>
-          )}
-
-          {/* Mute Toggle Button */}
-          <button
-            onClick={toggleMute}
-            className={`p-2 rounded-xl border transition-all duration-150 apple-press cursor-pointer ${
-              isMuted
-                ? 'bg-rose-500/15 border-rose-500/30 text-rose-300 hover:bg-rose-500/25'
-                : 'bg-white/[0.06] border-white/[0.08] text-slate-300 hover:text-white hover:bg-white/[0.1]'
-            }`}
-            title={isMuted ? 'Unmute voice output' : 'Mute voice output'}
-            aria-label="Toggle Voice Audio"
-          >
-            {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
-          </button>
-
-          {/* High Contrast Toggle Button */}
-          <button
-            onClick={toggleHighContrast}
-            className={`p-2 rounded-xl border transition-all duration-150 apple-press cursor-pointer ${
-              highContrast
-                ? 'bg-amber-500/20 border-amber-400/40 text-amber-200'
-                : 'bg-white/[0.06] border-white/[0.08] text-slate-300 hover:text-white hover:bg-white/[0.1]'
-            }`}
-            title={highContrast ? 'Standard theme' : 'High contrast accessibility theme'}
-            aria-label="Toggle High Contrast"
-          >
-            {highContrast ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-          </button>
-
-          {/* Primary Action Button */}
-          {activeTab !== 'library' ? (
-            <button
-              onClick={() => setActiveTab('library')}
-              className="uiverse-glow-btn hidden sm:flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-white text-xs font-semibold cursor-pointer shadow-[0_2px_12px_rgba(16,185,129,0.3)] whitespace-nowrap shrink-0"
-            >
-              <AnimatedBook className="w-3.5 h-3.5 text-white" />
-              <span>Explore ASL</span>
-            </button>
-          ) : (
-            <button
-              onClick={() => setActiveTab('translate')}
-              className="uiverse-glow-btn hidden sm:flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-white text-xs font-semibold cursor-pointer shadow-[0_2px_12px_rgba(16,185,129,0.3)] whitespace-nowrap shrink-0"
-            >
-              <AnimatedCamera className="w-3.5 h-3.5 text-white" />
-              <span>Launch Camera</span>
-            </button>
-          )}
+        <div className="mt-auto px-2 flex flex-col gap-3">
+          <SpeakingBadge on={isSpeaking} />
+          <div className="flex items-center gap-1">{utilities}</div>
         </div>
-      </div>
+      </aside>
 
-      {/* Mobile Nav Bar (below header on small screens) */}
-      <div className="md:hidden flex items-center justify-around px-2 py-2 border-t border-white/[0.06] bg-slate-950/90 overflow-x-auto">
-        {navItems.map((item) => {
-          const Icon = item.icon;
-          const isActive = activeTab === item.id;
-          return (
-            <button
-              key={item.id}
-              onClick={() => setActiveTab(item.id)}
-              className={`flex flex-col items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-medium transition-all whitespace-nowrap ${
-                isActive ? `${item.color} font-semibold` : 'text-slate-400'
-              }`}
-            >
-              <Icon className="w-4 h-4" active={isActive} />
-              <span>{item.shortLabel}</span>
-            </button>
-          );
-        })}
-      </div>
-    </header>
+      {/* Mobile: top bar */}
+      <header className="lg:hidden sticky top-0 z-40 bg-paper border-b-2 border-rule">
+        <div className="h-16 px-4 flex items-center justify-between">
+          <button onClick={() => setView('converse')} aria-label="GestureVoice home">
+            <Wordmark small />
+          </button>
+          <div className="flex items-center gap-1">
+            <SpeakingBadge on={isSpeaking} />
+            {utilities}
+          </div>
+        </div>
+      </header>
+
+      {/* Mobile: bottom tab bar */}
+      <nav
+        aria-label="Primary"
+        className="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-paper border-t-2 border-rule px-3 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] flex justify-around"
+      >
+        {NAV.map(({ id, label, icon: Icon, tint }) => (
+          <button
+            key={id}
+            onClick={() => setView(id)}
+            aria-current={view === id ? 'page' : undefined}
+            aria-label={label}
+            className="w-14 h-12 inline-flex items-center justify-center rounded-[14px] border-2 border-transparent aria-[current=page]:bg-partner-soft aria-[current=page]:border-[var(--partner-line)]"
+          >
+            <Icon className="w-7 h-7" strokeWidth={2.5} style={{ color: tint }} />
+          </button>
+        ))}
+        <button
+          onClick={onOpenSettings}
+          aria-label="Settings"
+          className="w-14 h-12 inline-flex items-center justify-center rounded-[14px] border-2 border-transparent"
+        >
+          <SlidersHorizontal className="w-7 h-7 text-ink-3" strokeWidth={2.5} />
+        </button>
+      </nav>
+    </>
   );
 };
