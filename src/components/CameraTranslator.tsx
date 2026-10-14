@@ -1028,7 +1028,7 @@ export const CameraTranslator: React.FC<CameraTranslatorProps> = ({
       const controller = new AbortController();
       const timeoutId = setTimeout(() => {
         controller.abort();
-      }, 5500);
+      }, 15000);
 
       const reqStart = performance.now();
 
@@ -1080,6 +1080,7 @@ export const CameraTranslator: React.FC<CameraTranslatorProps> = ({
             aslTip: data.aslTip,
             timestamp: now,
             thumbnail: base64Image,
+            source: data.engine === 'gemini-cloud' ? 'ai' : 'offline',
           };
 
           setLatestTranslation(translation);
@@ -1138,6 +1139,7 @@ export const CameraTranslator: React.FC<CameraTranslatorProps> = ({
             description: g.description,
             aslTip: g.aslTip,
             timestamp: Date.now(),
+            source: 'offline',
           };
           setLatestTranslation(fallbackTrans);
           onNewTranslation(fallbackTrans);
@@ -1566,7 +1568,9 @@ export const CameraTranslator: React.FC<CameraTranslatorProps> = ({
                 <p className="text-[1.25rem] font-black text-signer-ink">
                   {humanize(latestTranslation.gestureName)}
                   <span className="ml-2 text-sm font-extrabold uppercase tracking-wider opacity-80">
-                    {confidenceWord[latestTranslation.confidence] ?? latestTranslation.confidence}
+                    {latestTranslation.source === 'offline'
+                      ? 'Offline guess'
+                      : confidenceWord[latestTranslation.confidence] ?? latestTranslation.confidence}
                     {translationLatencyMs ? <span className="tnum"> · {(translationLatencyMs / 1000).toFixed(1)}s</span> : null}
                   </span>
                 </p>
@@ -1578,6 +1582,11 @@ export const CameraTranslator: React.FC<CameraTranslatorProps> = ({
                   ? latestTranslation.aslTip ?? latestTranslation.description
                   : 'Keep your hand inside the frame and try again.'}
               </p>
+              {latestTranslation.detected && latestTranslation.source === 'offline' && (
+                <p className="text-sm font-bold text-ink-2 mt-2">
+                  The AI didn’t answer in time, so this is a quick guess from your hand shape. It may be wrong.
+                </p>
+              )}
             </div>
           </div>
         )}

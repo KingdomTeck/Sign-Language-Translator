@@ -496,9 +496,9 @@ ${focusInstruction}
           },
         });
 
-        // Fast 3500ms timeout so cloud AI never blocks the UI
+        // Vision calls typically take 5–10s; give the model room before falling back
         const timeoutPromise = new Promise<never>((_, reject) =>
-          setTimeout(() => reject(new Error('Cloud model timeout')), 3500)
+          setTimeout(() => reject(new Error('Cloud model timeout')), 12000)
         );
 
         response = await Promise.race([generatePromise, timeoutPromise]);
@@ -684,9 +684,9 @@ Return ONLY a JSON response adhering to the schema.
           },
         });
 
-        // Race with 14s timeout
+        // Race with 30s timeout
         const timeoutPromise = new Promise((_, reject) =>
-          setTimeout(() => reject(new Error('Video translation timeout')), 14000)
+          setTimeout(() => reject(new Error('Video translation timeout')), 30000)
         );
 
         const aiResponse: any = await Promise.race([genPromise, timeoutPromise]);

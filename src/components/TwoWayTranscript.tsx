@@ -205,7 +205,10 @@ export const TwoWayTranscript: React.FC<TwoWayTranscriptProps> = ({
                         {m.text}
                       </p>
                       {isSigner && m.gestureName && (
-                        <p className="text-sm font-bold text-ink-3 mt-1">signed “{m.gestureName}”</p>
+                        <p className="text-sm font-bold text-ink-3 mt-1">
+                          signed “{m.gestureName}”
+                          {m.source === 'offline' && <span className="text-[#cc8a00]"> · offline guess</span>}
+                        </p>
                       )}
                       {!isSigner && m.aslCue && (
                         <p className="text-sm font-bold text-partner-ink mt-1">Related sign: {m.aslCue}</p>

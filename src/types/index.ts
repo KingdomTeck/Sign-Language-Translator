@@ -19,6 +19,8 @@ export interface GestureTranslation {
   aslTip?: string;
   timestamp: number;
   thumbnail?: string;
+  /** 'ai' when the cloud model answered; 'offline' when the local hand-shape guesser did. */
+  source?: 'ai' | 'offline';
 }
 
 export type ConversationRole = 'signer' | 'partner' | 'system';
@@ -32,6 +34,7 @@ export interface TranscriptMessage {
   confidence?: ConfidenceLevel;
   aslCue?: string;
   audioPlayed?: boolean;
+  source?: 'ai' | 'offline';
 }
 
 export interface VoiceSettings {

@@ -922,8 +922,16 @@ ${translationResult.segments
                 {(activeTab === 'transcript' || activeTab === 'editor') && (
                   <div className="p-5 sm:p-6">
                     <p className="text-xs font-extrabold uppercase tracking-wider text-ink-3 tnum">
-                      {words} words · {confidenceWord[translationResult.confidence] ?? translationResult.confidence}
+                      {words} words ·{' '}
+                      {translationResult.engine === 'gemini-multimodal'
+                        ? confidenceWord[translationResult.confidence] ?? translationResult.confidence
+                        : 'Offline guess'}
                     </p>
+                    {translationResult.engine !== 'gemini-multimodal' && (
+                      <p className="mt-3 rounded-xl bg-sunk px-4 py-3 text-sm font-bold text-ink-2">
+                        The AI didn’t finish in time, so this transcript comes from hand-shape tracking alone. Check it before you share it.
+                      </p>
+                    )}
                     {isEditingTranscript ? (
                       <>
                         <label htmlFor="transcript-edit" className="sr-only">

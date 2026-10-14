@@ -98,6 +98,7 @@ export default function App() {
             : translation.gestureName.split('__')[0].replace(/_/g, ' ').toLowerCase().replace(/^./, (c) => c.toUpperCase()),
         timestamp: translation.timestamp,
         confidence: translation.confidence,
+        source: translation.source,
       },
     ]);
   }, []);
