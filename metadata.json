@@ -1,0 +1,6 @@
+{
+  "name": "GestureVoice - Sign Language to Voice Translator",
+  "description": "Real-time AI sign language and hand gesture translator that converts camera gestures into voice and enables two-way communication.",
+  "requestFramePermissions": ["camera", "microphone"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
