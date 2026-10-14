@@ -756,8 +756,8 @@ ${translationResult.segments
             onDrop={handleDrop}
             className="lg:col-span-8 rounded-[20px] border-2 border-dashed border-rule-strong bg-sunk min-h-[360px] flex flex-col items-center justify-center text-center px-6 py-12"
           >
-            <span className="w-20 h-20 rounded-[22px] bg-[#f3e1ff] dark:bg-[#3a2a4a] inline-flex items-center justify-center mb-5">
-              <Upload className="w-10 h-10 text-[#ce82ff]" strokeWidth={2.5} />
+            <span className="w-20 h-20 rounded-[22px] bg-[#ffe5dc] dark:bg-[#3d2219] inline-flex items-center justify-center mb-5">
+              <Upload className="w-10 h-10 text-coral" strokeWidth={2.5} />
             </span>
             <p className="text-[1.5rem] font-black">Drop a video here</p>
             <p className="mt-1 text-ink-3 font-bold text-[0.9375rem]">MP4, WebM or MOV. Shorter clips translate faster.</p>

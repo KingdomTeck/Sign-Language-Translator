@@ -207,7 +207,7 @@ export const TwoWayTranscript: React.FC<TwoWayTranscriptProps> = ({
                       {isSigner && m.gestureName && (
                         <p className="text-sm font-bold text-ink-3 mt-1">
                           signed “{m.gestureName}”
-                          {m.source === 'offline' && <span className="text-[#cc8a00]"> · offline guess</span>}
+                          {m.source === 'offline' && <span className="text-coral"> · offline guess</span>}
                         </p>
                       )}
                       {!isSigner && m.aslCue && (
@@ -218,7 +218,7 @@ export const TwoWayTranscript: React.FC<TwoWayTranscriptProps> = ({
                   {isSigner && (
                     <button
                       onClick={() => !isMuted && speechManager.speak(m.text, voiceSettings)}
-                      className="icon-btn !w-9 !h-9 mb-1 text-partner shrink-0"
+                      className="icon-btn !w-9 !h-9 mb-1 text-partner-ink shrink-0"
                       aria-label={`Say again: ${m.text}`}
                       title="Say again"
                     >

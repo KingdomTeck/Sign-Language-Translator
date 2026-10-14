@@ -114,7 +114,7 @@ const VIRTUAL_SIGNS: VirtualSignModel[] = [
       ctx.translate(320, 240);
       ctx.rotate(waveAngle);
       // Forearm & wrist
-      ctx.fillStyle = '#58cc02';
+      ctx.fillStyle = '#ffbf00';
       ctx.beginPath();
       ctx.roundRect(-24, 70, 48, 120, 16);
       ctx.fill();
@@ -151,7 +151,7 @@ const VIRTUAL_SIGNS: VirtualSignModel[] = [
     drawHand: (ctx) => {
       ctx.save();
       ctx.translate(320, 240);
-      ctx.fillStyle = '#58cc02';
+      ctx.fillStyle = '#ffbf00';
       // Palm
       ctx.beginPath();
       ctx.roundRect(-38, -25, 76, 100, 22);
@@ -186,7 +186,7 @@ const VIRTUAL_SIGNS: VirtualSignModel[] = [
     drawHand: (ctx) => {
       ctx.save();
       ctx.translate(320, 240);
-      ctx.fillStyle = '#58cc02';
+      ctx.fillStyle = '#ffbf00';
       // Palm
       ctx.beginPath();
       ctx.roundRect(-36, -15, 72, 90, 20);
@@ -229,7 +229,7 @@ const VIRTUAL_SIGNS: VirtualSignModel[] = [
     drawHand: (ctx) => {
       ctx.save();
       ctx.translate(320, 240);
-      ctx.fillStyle = '#58cc02';
+      ctx.fillStyle = '#ffbf00';
       // Fist body
       ctx.beginPath();
       ctx.roundRect(-40, -15, 80, 80, 22);
@@ -252,13 +252,13 @@ const VIRTUAL_SIGNS: VirtualSignModel[] = [
       const nodOffset = Math.sin(t * 0.007) * 20;
       ctx.save();
       ctx.translate(320, 240 + nodOffset);
-      ctx.fillStyle = '#58cc02';
+      ctx.fillStyle = '#ffbf00';
       // Fist
       ctx.beginPath();
       ctx.roundRect(-42, -35, 84, 85, 24);
       ctx.fill();
       // Curled finger lines
-      ctx.strokeStyle = '#46a302';
+      ctx.strokeStyle = '#d99f00';
       ctx.lineWidth = 4;
       ctx.beginPath();
       ctx.moveTo(-35, -5);
@@ -284,7 +284,7 @@ const VIRTUAL_SIGNS: VirtualSignModel[] = [
       const forwardOffset = (Math.sin(t * 0.005) + 1) * 30;
       ctx.save();
       ctx.translate(320, 220 + forwardOffset);
-      ctx.fillStyle = '#58cc02';
+      ctx.fillStyle = '#ffbf00';
       // Palm
       ctx.beginPath();
       ctx.roundRect(-36, -30, 72, 90, 20);
@@ -312,7 +312,7 @@ const VIRTUAL_SIGNS: VirtualSignModel[] = [
     drawHand: (ctx) => {
       ctx.save();
       ctx.translate(320, 240);
-      ctx.fillStyle = '#58cc02';
+      ctx.fillStyle = '#ffbf00';
       // Palm base
       ctx.beginPath();
       ctx.roundRect(-35, -15, 70, 85, 20);
@@ -324,7 +324,7 @@ const VIRTUAL_SIGNS: VirtualSignModel[] = [
         ctx.fill();
       });
       // Pinched loop (thumb + index)
-      ctx.strokeStyle = '#58cc02';
+      ctx.strokeStyle = '#ffbf00';
       ctx.lineWidth = 14;
       ctx.beginPath();
       ctx.arc(-22, -18, 22, 0, Math.PI * 2);
@@ -342,7 +342,7 @@ const VIRTUAL_SIGNS: VirtualSignModel[] = [
     drawHand: (ctx) => {
       ctx.save();
       ctx.translate(320, 240);
-      ctx.fillStyle = '#58cc02';
+      ctx.fillStyle = '#ffbf00';
       // Palm
       ctx.beginPath();
       ctx.roundRect(-35, -20, 70, 80, 20);
@@ -372,7 +372,7 @@ const VIRTUAL_SIGNS: VirtualSignModel[] = [
     drawHand: (ctx) => {
       ctx.save();
       ctx.translate(320, 240);
-      ctx.fillStyle = '#58cc02';
+      ctx.fillStyle = '#ffbf00';
       // Closed fist base
       ctx.beginPath();
       ctx.roundRect(-36, -20, 72, 85, 22);
@@ -398,7 +398,7 @@ const VIRTUAL_SIGNS: VirtualSignModel[] = [
     drawHand: (ctx) => {
       ctx.save();
       ctx.translate(320, 240);
-      ctx.fillStyle = '#58cc02';
+      ctx.fillStyle = '#ffbf00';
       // Palm
       ctx.beginPath();
       ctx.roundRect(-35, -15, 70, 85, 20);
@@ -1416,7 +1416,7 @@ export const CameraTranslator: React.FC<CameraTranslatorProps> = ({
               <span className="inline-flex items-center gap-2 text-sm font-extrabold">
                 <span
                   className={stageStatus.tone === 'idle' ? 'w-2.5 h-2.5 rounded-full bg-white/50' : 'live-dot'}
-                  style={{ color: stageStatus.tone === 'found' ? '#93d333' : '#ffffff' }}
+                  style={{ color: stageStatus.tone === 'found' ? '#ffbf00' : '#ffffff' }}
                   aria-hidden="true"
                 />
                 <span aria-live="polite">{stageStatus.text}</span>
@@ -1556,8 +1556,8 @@ export const CameraTranslator: React.FC<CameraTranslatorProps> = ({
             }`}
           >
             <span
-              className={`shrink-0 w-10 h-10 rounded-full inline-flex items-center justify-center text-white ${
-                latestTranslation.detected ? 'bg-signer' : 'bg-alert'
+              className={`shrink-0 w-10 h-10 rounded-full inline-flex items-center justify-center ${
+                latestTranslation.detected ? 'bg-signer text-on-signer' : 'bg-alert text-white'
               }`}
               aria-hidden="true"
             >
@@ -1607,7 +1607,7 @@ export const CameraTranslator: React.FC<CameraTranslatorProps> = ({
                 title={phrase.text}
               >
                 <span className="text-[1rem] font-extrabold">{phrase.label}</span>
-                <Volume2 className="w-5 h-5 text-partner shrink-0" strokeWidth={2.5} />
+                <Volume2 className="w-5 h-5 text-partner-ink shrink-0" strokeWidth={2.5} />
               </button>
             </li>
           ))}
@@ -1632,7 +1632,7 @@ export const CameraTranslator: React.FC<CameraTranslatorProps> = ({
               className="tile flex flex-col items-center justify-center gap-1 px-2 pt-4 pb-3 text-center"
               title={sample.description}
             >
-              <span className="text-[2.25rem] font-black leading-none text-partner">
+              <span className="text-[2.25rem] font-black leading-none text-partner-ink">
                 {sample.name.replace(/^Letter\s+/i, '').charAt(0)}
               </span>
               <span className="text-[0.8125rem] font-extrabold text-ink-2 leading-tight">{sample.name}</span>

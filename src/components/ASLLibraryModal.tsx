@@ -177,7 +177,7 @@ export const ASLLibraryModal: React.FC<ASLLibraryModalProps> = ({ onSelectPracti
                       aria-current={active ? 'true' : undefined}
                       className="tile aspect-[4/5] flex flex-col items-center justify-center gap-2"
                     >
-                      <span className="text-[3rem] font-black leading-none text-partner">{glyphOf(item)}</span>
+                      <span className="text-[3rem] font-black leading-none text-partner-ink">{glyphOf(item)}</span>
                       <span className="text-sm font-extrabold text-ink-2">letter {glyphOf(item)?.toLowerCase()}</span>
                     </button>
                   );

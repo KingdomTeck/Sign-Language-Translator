@@ -1,4 +1,5 @@
 import React from 'react';
+import { Mascot } from './Mascot';
 import { Volume2, VolumeX, Moon, Sun, SlidersHorizontal, Hand, Clapperboard, BookOpen } from 'lucide-react';
 
 export type AppView = 'converse' | 'video' | 'signs';
@@ -15,14 +16,17 @@ interface HeaderProps {
 }
 
 const NAV: { id: AppView; label: string; icon: React.ElementType; tint: string }[] = [
-  { id: 'converse', label: 'Converse', icon: Hand, tint: 'var(--signer)' },
-  { id: 'video', label: 'Video', icon: Clapperboard, tint: '#ce82ff' },
-  { id: 'signs', label: 'Signs', icon: BookOpen, tint: 'var(--sun)' },
+  { id: 'converse', label: 'Converse', icon: Hand, tint: 'var(--signer-edge)' },
+  { id: 'video', label: 'Video', icon: Clapperboard, tint: 'var(--sun)' },
+  { id: 'signs', label: 'Signs', icon: BookOpen, tint: 'var(--partner)' },
 ];
 
-export const Wordmark: React.FC = () => (
-  <span className="text-[1.75rem] leading-none font-black tracking-[-0.03em] text-signer select-none">
-    gesturevoice
+export const Wordmark: React.FC<{ small?: boolean }> = ({ small }) => (
+  <span className="inline-flex items-center gap-2 select-none">
+    <Mascot size={small ? 30 : 36} />
+    <span className={`${small ? 'text-[1.375rem]' : 'text-[1.625rem]'} leading-none font-black tracking-[-0.03em] text-ink`}>
+      gesture<span className="text-partner-ink">voice</span>
+    </span>
   </span>
 );
 
@@ -108,7 +112,7 @@ export const Header: React.FC<HeaderProps> = ({
       <header className="lg:hidden sticky top-0 z-40 bg-paper border-b-2 border-rule">
         <div className="h-16 px-4 flex items-center justify-between">
           <button onClick={() => setView('converse')} aria-label="GestureVoice home">
-            <span className="text-[1.5rem] leading-none font-black tracking-[-0.03em] text-signer">gesturevoice</span>
+            <Wordmark small />
           </button>
           <div className="flex items-center gap-1">
             <SpeakingBadge on={isSpeaking} />

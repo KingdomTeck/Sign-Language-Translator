@@ -33,6 +33,8 @@
   --color-partner-edge: var(--partner-edge);
   --color-partner-soft: var(--partner-soft);
   --color-sun: var(--sun);
+  --color-coral: var(--sun);
+  --color-on-signer: var(--on-signer);
   --color-alert: var(--alert);
   --color-on-accent: var(--on-accent);
 }
@@ -46,19 +48,20 @@
   --ink-3: #afafaf;
   --rule: #e5e5e5;
   --rule-strong: #cecece;
-  --signer: #58cc02;
-  --signer-ink: #58a700;
-  --signer-edge: #46a302;
-  --signer-soft: #d7ffb8;
-  --partner: #1cb0f6;
-  --partner-ink: #1899d6;
-  --partner-edge: #1899d6;
-  --partner-soft: #ddf4ff;
-  --partner-line: #84d8ff;
-  --sun: #ffc800;
+  --signer: #ffbf00;
+  --signer-ink: #8a6100;
+  --signer-edge: #d99f00;
+  --signer-soft: #fff3cc;
+  --partner: #0000ff;
+  --partner-ink: #0000e0;
+  --partner-edge: #0000b3;
+  --partner-soft: #e6e6ff;
+  --partner-line: #a3a3ff;
+  --sun: #ff7f50;
   --alert: #ff4b4b;
   --alert-edge: #ea2b2b;
   --on-accent: #ffffff;
+  --on-signer: #3a2a00;
   --stage: #131f24;
   color-scheme: light;
 }
@@ -73,15 +76,15 @@
     --ink-3: #6f8590;
     --rule: #37464f;
     --rule-strong: #52656d;
-    --signer: #93d333;
-    --signer-ink: #93d333;
-    --signer-edge: #79b933;
-    --signer-soft: #1f3a1d;
-    --partner: #49c0f8;
-    --partner-ink: #49c0f8;
-    --partner-edge: #1899d6;
-    --partner-soft: #1a3a4a;
-    --partner-line: #3f85a7;
+    --signer: #ffbf00;
+    --signer-ink: #ffcf40;
+    --signer-edge: #c29100;
+    --signer-soft: #3a2f0d;
+    --partner: #3d3dff;
+    --partner-ink: #8c8cff;
+    --partner-edge: #1f1fb8;
+    --partner-soft: #1c1c4d;
+    --partner-line: #4a4ad6;
     --on-accent: #131f24;
     --stage: #0b1418;
     color-scheme: dark;
@@ -97,15 +100,15 @@
   --ink-3: #6f8590;
   --rule: #37464f;
   --rule-strong: #52656d;
-  --signer: #93d333;
-  --signer-ink: #93d333;
-  --signer-edge: #79b933;
-  --signer-soft: #1f3a1d;
-  --partner: #49c0f8;
-  --partner-ink: #49c0f8;
-  --partner-edge: #1899d6;
-  --partner-soft: #1a3a4a;
-  --partner-line: #3f85a7;
+  --signer: #ffbf00;
+  --signer-ink: #ffcf40;
+  --signer-edge: #c29100;
+  --signer-soft: #3a2f0d;
+  --partner: #3d3dff;
+  --partner-ink: #8c8cff;
+  --partner-edge: #1f1fb8;
+  --partner-soft: #1c1c4d;
+  --partner-line: #4a4ad6;
   --on-accent: #131f24;
   --stage: #0b1418;
   color-scheme: dark;
@@ -121,12 +124,12 @@
   --ink-3: #3d3d3d;
   --rule: #000000;
   --rule-strong: #000000;
-  --signer: #2b6e00;
-  --signer-ink: #2b6e00;
+  --signer: #ffbf00;
+  --signer-ink: #5c4000;
   --signer-edge: #000000;
   --signer-soft: #ffffff;
-  --partner: #00557f;
-  --partner-ink: #00557f;
+  --partner: #0000ff;
+  --partner-ink: #0000cc;
   --partner-edge: #000000;
   --partner-soft: #ffffff;
   --partner-line: #000000;
@@ -159,7 +162,7 @@
   }
 
   ::selection {
-    background: var(--partner-soft);
+    background: var(--signer-soft);
     color: var(--ink);
   }
 
@@ -237,12 +240,12 @@
   .btn-ink {
     --edge: var(--signer-edge);
     background: var(--signer);
-    color: var(--on-accent);
+    color: var(--on-signer);
   }
   .btn-partner {
     --edge: var(--partner-edge);
     background: var(--partner);
-    color: var(--on-accent);
+    color: #ffffff;
   }
   .btn-danger {
     --edge: var(--alert-edge);

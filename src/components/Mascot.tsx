@@ -53,8 +53,8 @@ export const Mascot: React.FC<MascotProps> = ({ size = 96, mood = 'happy', class
         <path d="M46 74 Q54 83 62 74" fill="none" stroke="#3c3c3c" strokeWidth="3" strokeLinecap="round" />
       )}
       {/* cheeks */}
-      <circle cx="34" cy="70" r="4" fill="#ff9aa2" opacity="0.55" />
-      <circle cx="74" cy="70" r="4" fill="#ff9aa2" opacity="0.55" />
+      <circle cx="34" cy="70" r="4" fill="var(--sun)" opacity="0.45" />
+      <circle cx="74" cy="70" r="4" fill="var(--sun)" opacity="0.45" />
     </svg>
   );
 };
