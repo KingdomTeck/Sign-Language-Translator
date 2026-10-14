@@ -16,20 +16,20 @@ function renderSampleCard(canvas: HTMLCanvasElement, sample: Pick<SampleGesture,
   if (!ctx) return;
   canvas.width = 640;
   canvas.height = 480;
-  ctx.fillStyle = '#1a1916';
+  ctx.fillStyle = '#131f24';
   ctx.fillRect(0, 0, 640, 480);
 
   ctx.textAlign = 'left';
-  ctx.fillStyle = '#868174';
-  ctx.font = '600 15px "Instrument Sans", sans-serif';
+  ctx.fillStyle = '#6f8590';
+  ctx.font = '800 16px Nunito, sans-serif';
   ctx.fillText('SAMPLE SIGN', 56, 96);
 
-  ctx.fillStyle = '#f3efe6';
-  ctx.font = '72px "Instrument Serif", Georgia, serif';
+  ctx.fillStyle = '#ffffff';
+  ctx.font = '900 68px Nunito, sans-serif';
   ctx.fillText(sample.name, 56, 176);
 
-  ctx.fillStyle = '#b9b4a6';
-  ctx.font = '22px "Instrument Sans", sans-serif';
+  ctx.fillStyle = '#b4c1c8';
+  ctx.font = '700 22px Nunito, sans-serif';
   const words = sample.description.split(' ');
   let line = '';
   let y = 232;

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Mic, Square, ArrowUp, Trash2, Download, Copy, Check, Volume2 } from 'lucide-react';
+import { Mic, Square, ArrowUp, Trash2, Download, Copy, Check, Volume2, Hand } from 'lucide-react';
+import { Mascot } from './Mascot';
 import { TranscriptMessage, VoiceSettings } from '../types';
 import { speechRecognitionManager } from '../services/speechRecognition';
 import { speechManager, soundEffects } from '../services/speechSynthesis';
@@ -121,101 +122,117 @@ export const TwoWayTranscript: React.FC<TwoWayTranscriptProps> = ({
   };
 
   return (
-    <div className="sheet h-full min-h-[520px] flex flex-col overflow-hidden">
+    <div className="sheet h-full min-h-[560px] flex flex-col overflow-hidden">
       {/* Panel header */}
-      <div className="flex items-center justify-between gap-3 pl-5 pr-2 h-14 border-b border-rule shrink-0">
-        <h2 className="text-[0.9375rem] font-semibold">Conversation</h2>
+      <div className="flex items-center justify-between gap-3 pl-5 pr-2 h-16 border-b-2 border-rule shrink-0">
+        <h2 className="text-[1.25rem] font-black">Conversation</h2>
         {visible.length > 0 && (
           <div className="flex items-center">
             <button onClick={handleCopy} className="icon-btn" aria-label="Copy conversation" title="Copy">
-              {copied ? <Check className="w-4 h-4 text-signer" /> : <Copy className="w-4 h-4" />}
+              {copied ? <Check className="w-5 h-5 text-signer" strokeWidth={3} /> : <Copy className="w-5 h-5" strokeWidth={2.5} />}
             </button>
             <button onClick={handleDownload} className="icon-btn" aria-label="Download conversation" title="Download .txt">
-              <Download className="w-4 h-4" />
+              <Download className="w-5 h-5" strokeWidth={2.5} />
             </button>
             <button
               onClick={handleClear}
-              className={confirmClear ? 'btn btn-sm btn-quiet !text-alert' : 'icon-btn'}
+              className={confirmClear ? 'btn btn-sm btn-danger' : 'icon-btn'}
               aria-label="Clear conversation"
               title="Clear"
             >
-              {confirmClear ? 'Clear all?' : <Trash2 className="w-4 h-4" />}
+              {confirmClear ? 'Clear all?' : <Trash2 className="w-5 h-5" strokeWidth={2.5} />}
             </button>
           </div>
         )}
       </div>
 
       {/* Thread */}
-      <div ref={threadRef} className="flex-1 overflow-y-auto scroll-quiet px-5 py-5" aria-live="polite">
+      <div ref={threadRef} className="flex-1 overflow-y-auto scroll-quiet px-4 sm:px-5 py-5" aria-live="polite">
         {visible.length === 0 && !interimText ? (
-          <div className="h-full flex flex-col justify-center max-w-[22rem] mx-auto py-10">
-            <p className="said text-[1.75rem] text-ink">Nothing said yet.</p>
-            <dl className="mt-6 space-y-4 text-[0.9375rem] text-ink-2">
-              <div className="flex gap-3">
-                <span className="mt-[7px] w-2 h-2 rounded-full bg-signer shrink-0" aria-hidden="true" />
-                <div>
-                  <dt className="font-semibold text-ink">Signs become speech</dt>
-                  <dd>Each sign the camera reads is spoken aloud and written here.</dd>
-                </div>
+          <div className="h-full flex flex-col justify-center gap-6 py-8">
+            <div className="flex items-center gap-4">
+              <Mascot size={64} className="bob shrink-0" />
+              <div className="bubble font-extrabold">Nothing said yet. Here’s how it works:</div>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="tile p-4">
+                <span className="inline-flex w-10 h-10 rounded-xl bg-signer-soft items-center justify-center">
+                  <Hand className="w-6 h-6 text-signer-ink" strokeWidth={2.5} />
+                </span>
+                <p className="mt-3 font-black">Signs → speech</p>
+                <p className="text-sm font-bold text-ink-2 mt-0.5">Each sign is spoken aloud and written here.</p>
               </div>
-              <div className="flex gap-3">
-                <span className="mt-[7px] w-2 h-2 rounded-full bg-partner shrink-0" aria-hidden="true" />
-                <div>
-                  <dt className="font-semibold text-ink">Speech becomes text</dt>
-                  <dd>Replies appear in large type, easy to read from across a table.</dd>
-                </div>
+              <div className="tile p-4">
+                <span className="inline-flex w-10 h-10 rounded-xl bg-partner-soft items-center justify-center">
+                  <Mic className="w-6 h-6 text-partner-ink" strokeWidth={2.5} />
+                </span>
+                <p className="mt-3 font-black">Speech → text</p>
+                <p className="text-sm font-bold text-ink-2 mt-0.5">Replies show up big, easy to read across a table.</p>
               </div>
-            </dl>
+            </div>
           </div>
         ) : (
-          <ol className="flex flex-col gap-6">
+          <ol className="flex flex-col gap-5">
             {visible.map((m, i) => {
               const isSigner = m.role === 'signer';
               const isLast = i === visible.length - 1;
               return (
-                <li key={m.id} className={`arrive group pl-4 border-l-2 ${isSigner ? 'border-signer' : 'border-partner'}`}>
-                  <div className="flex items-baseline gap-2 text-[0.8125rem]">
-                    <span className={`font-semibold ${isSigner ? 'text-signer' : 'text-partner'}`}>
-                      {isSigner ? 'Signer' : 'Partner'}
+                <li key={m.id} className={`arrive flex items-end gap-2.5 ${isSigner ? '' : 'flex-row-reverse'}`}>
+                  {isSigner ? (
+                    <Mascot size={36} className="shrink-0 mb-1" />
+                  ) : (
+                    <span className="shrink-0 mb-1 w-9 h-9 rounded-full bg-partner text-white inline-flex items-center justify-center" aria-hidden="true">
+                      <Mic className="w-5 h-5" strokeWidth={2.5} />
                     </span>
-                    <span className="text-ink-3 tnum">{time(m.timestamp)}</span>
-                    {isSigner && m.gestureName && <span className="text-ink-3">· signed “{m.gestureName}”</span>}
-                  </div>
-                  <div className="flex items-start gap-2 mt-1">
-                    <p
-                      className={`said flex-1 ${
+                  )}
+                  <div className={`min-w-0 max-w-[85%] flex flex-col ${isSigner ? 'items-start' : 'items-end'}`}>
+                    <div className={`flex items-baseline gap-2 text-xs font-extrabold uppercase tracking-wider mb-1 px-1 ${isSigner ? '' : 'flex-row-reverse'}`}>
+                      <span className={isSigner ? 'text-signer-ink' : 'text-partner-ink'}>{isSigner ? 'Signer' : 'Partner'}</span>
+                      <span className="text-ink-3 tnum normal-case tracking-normal font-bold">{time(m.timestamp)}</span>
+                    </div>
+                    <div
+                      className={`group relative rounded-2xl border-2 border-b-4 px-4 py-3 ${
                         isSigner
-                          ? isLast ? 'text-[1.75rem]' : 'text-[1.375rem]'
-                          : isLast ? 'text-[2rem]' : 'text-[1.5rem]'
-                      } text-ink`}
+                          ? 'bg-sheet border-rule rounded-bl-md'
+                          : 'bg-partner-soft border-[var(--partner-line)] rounded-br-md'
+                      }`}
                     >
-                      {m.text}
-                    </p>
-                    {isSigner && (
-                      <button
-                        onClick={() => !isMuted && speechManager.speak(m.text, voiceSettings)}
-                        className="icon-btn -mt-1 opacity-60 group-hover:opacity-100 focus:opacity-100"
-                        aria-label={`Say again: ${m.text}`}
-                        title="Say again"
+                      <p
+                        className={`said ${
+                          isSigner ? (isLast ? 'text-[1.375rem]' : 'text-[1.125rem]') : isLast ? 'text-[1.75rem]' : 'text-[1.25rem]'
+                        } text-ink`}
                       >
-                        <Volume2 className="w-4 h-4" />
-                      </button>
-                    )}
+                        {m.text}
+                      </p>
+                      {isSigner && m.gestureName && (
+                        <p className="text-sm font-bold text-ink-3 mt-1">signed “{m.gestureName}”</p>
+                      )}
+                      {!isSigner && m.aslCue && (
+                        <p className="text-sm font-bold text-partner-ink mt-1">Related sign: {m.aslCue}</p>
+                      )}
+                    </div>
                   </div>
-                  {!isSigner && m.aslCue && (
-                    <p className="mt-1.5 text-[0.8125rem] text-ink-3">
-                      Related sign: <span className="text-ink-2 font-medium">{m.aslCue}</span>
-                    </p>
+                  {isSigner && (
+                    <button
+                      onClick={() => !isMuted && speechManager.speak(m.text, voiceSettings)}
+                      className="icon-btn !w-9 !h-9 mb-1 text-partner shrink-0"
+                      aria-label={`Say again: ${m.text}`}
+                      title="Say again"
+                    >
+                      <Volume2 className="w-5 h-5" strokeWidth={2.5} />
+                    </button>
                   )}
                 </li>
               );
             })}
             {interimText && (
-              <li className="pl-4 border-l-2 border-dashed border-partner">
-                <div className="flex items-center gap-2 text-[0.8125rem] text-partner font-semibold">
-                  <span className="live-dot" aria-hidden="true" /> Partner is speaking
+              <li className="flex items-end gap-2.5 flex-row-reverse">
+                <span className="shrink-0 mb-1 w-9 h-9 rounded-full bg-partner text-white inline-flex items-center justify-center">
+                  <span className="live-dot !bg-white" aria-hidden="true" />
+                </span>
+                <div className="max-w-[85%] rounded-2xl rounded-br-md border-2 border-dashed border-[var(--partner-line)] px-4 py-3">
+                  <p className="said text-[1.75rem] text-ink-2">{interimText}</p>
                 </div>
-                <p className="said italic text-[2rem] text-ink-2 mt-1">{interimText}</p>
               </li>
             )}
           </ol>
@@ -223,22 +240,22 @@ export const TwoWayTranscript: React.FC<TwoWayTranscriptProps> = ({
       </div>
 
       {/* Partner reply */}
-      <div className="border-t border-rule p-3 sm:p-4 shrink-0 bg-sheet">
-        {micError && <p className="text-sm text-alert mb-2 px-1">{micError}</p>}
+      <div className="border-t-2 border-rule p-3 sm:p-4 shrink-0">
+        {micError && <p className="text-sm font-bold text-alert mb-2 px-1">{micError}</p>}
         <form onSubmit={handleSubmit} className="flex items-center gap-2">
           <button
             type="button"
             onClick={toggleListening}
-            className={`btn shrink-0 ${isListening ? 'btn-ink' : 'btn-partner'}`}
+            className={`btn shrink-0 ${isListening ? 'btn-danger' : 'btn-partner'}`}
             aria-pressed={isListening}
           >
             {isListening ? (
               <>
-                <Square className="w-3.5 h-3.5 fill-current" /> Done
+                <Square className="w-4 h-4 fill-current" /> Done
               </>
             ) : (
               <>
-                <Mic className="w-4 h-4" /> Reply
+                <Mic className="w-5 h-5" strokeWidth={2.5} /> Reply
               </>
             )}
           </button>
@@ -251,16 +268,11 @@ export const TwoWayTranscript: React.FC<TwoWayTranscriptProps> = ({
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
             placeholder={isListening ? 'Listening…' : 'or type a reply'}
-            className="field !rounded-full"
+            className="field"
             autoComplete="off"
           />
-          <button
-            type="submit"
-            disabled={!draft.trim()}
-            className="icon-btn shrink-0 !bg-ink !text-paper disabled:!bg-rule disabled:!text-ink-3"
-            aria-label="Send reply"
-          >
-            <ArrowUp className="w-4 h-4" />
+          <button type="submit" disabled={!draft.trim()} className="btn btn-partner shrink-0 !px-0 w-12" aria-label="Send reply">
+            <ArrowUp className="w-5 h-5" strokeWidth={3} />
           </button>
         </form>
       </div>

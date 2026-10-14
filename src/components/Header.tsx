@@ -1,5 +1,5 @@
 import React from 'react';
-import { Volume2, VolumeX, Moon, Sun, SlidersHorizontal } from 'lucide-react';
+import { Volume2, VolumeX, Moon, Sun, SlidersHorizontal, Hand, Clapperboard, BookOpen } from 'lucide-react';
 
 export type AppView = 'converse' | 'video' | 'signs';
 
@@ -14,20 +14,31 @@ interface HeaderProps {
   onOpenSettings: () => void;
 }
 
-const NAV: { id: AppView; label: string }[] = [
-  { id: 'converse', label: 'Converse' },
-  { id: 'video', label: 'Video' },
-  { id: 'signs', label: 'Signs' },
+const NAV: { id: AppView; label: string; icon: React.ElementType; tint: string }[] = [
+  { id: 'converse', label: 'Converse', icon: Hand, tint: 'var(--signer)' },
+  { id: 'video', label: 'Video', icon: Clapperboard, tint: '#ce82ff' },
+  { id: 'signs', label: 'Signs', icon: BookOpen, tint: 'var(--sun)' },
 ];
 
-/** Two overlapping marks — one per voice in the conversation. */
 export const Wordmark: React.FC = () => (
-  <span className="flex items-center gap-2.5 select-none">
-    <svg width="26" height="18" viewBox="0 0 26 18" aria-hidden="true">
-      <circle cx="9" cy="9" r="8" fill="var(--signer)" />
-      <circle cx="17" cy="9" r="8" fill="var(--partner)" style={{ mixBlendMode: 'multiply' }} />
-    </svg>
-    <span className="text-[1.0625rem] font-semibold tracking-[-0.01em] text-ink">GestureVoice</span>
+  <span className="text-[1.75rem] leading-none font-black tracking-[-0.03em] text-signer select-none">
+    gesturevoice
+  </span>
+);
+
+const SpeakingBadge: React.FC<{ on: boolean }> = ({ on }) => (
+  <span
+    aria-live="polite"
+    className={`inline-flex items-center gap-2 text-sm font-extrabold uppercase tracking-wider text-signer-ink transition-opacity ${
+      on ? 'opacity-100' : 'opacity-0'
+    }`}
+  >
+    <span className="speak-bars" aria-hidden="true">
+      <i />
+      <i />
+      <i />
+    </span>
+    {on ? 'Speaking' : ''}
   </span>
 );
 
@@ -41,69 +52,95 @@ export const Header: React.FC<HeaderProps> = ({
   isSpeaking,
   onOpenSettings,
 }) => {
-  const nav = (
-    <nav aria-label="Primary" className="flex items-stretch gap-7 h-full">
-      {NAV.map((item) => (
-        <button
-          key={item.id}
-          onClick={() => setView(item.id)}
-          aria-current={view === item.id ? 'page' : undefined}
-          className="navlink"
-        >
-          {item.label}
-        </button>
-      ))}
-    </nav>
+  const utilities = (
+    <>
+      <button
+        onClick={toggleMute}
+        className="icon-btn"
+        aria-pressed={isMuted}
+        aria-label={isMuted ? 'Unmute voice' : 'Mute voice'}
+        title={isMuted ? 'Voice is muted' : 'Mute voice'}
+      >
+        {isMuted ? <VolumeX className="w-5 h-5 text-alert" strokeWidth={2.5} /> : <Volume2 className="w-5 h-5" strokeWidth={2.5} />}
+      </button>
+      <button
+        onClick={toggleTheme}
+        className="icon-btn"
+        aria-label={isDark ? 'Use light theme' : 'Use dark theme'}
+        title={isDark ? 'Light theme' : 'Dark theme'}
+      >
+        {isDark ? <Sun className="w-5 h-5" strokeWidth={2.5} /> : <Moon className="w-5 h-5" strokeWidth={2.5} />}
+      </button>
+    </>
   );
 
   return (
-    <header className="sticky top-0 z-40 bg-paper/95 backdrop-blur-sm border-b border-rule">
-      <div className="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-stretch justify-between gap-6">
-        <div className="flex items-center gap-10">
+    <>
+      {/* Desktop: left rail */}
+      <aside className="hidden lg:flex fixed inset-y-0 left-0 z-40 w-[248px] flex-col border-r-2 border-rule bg-paper px-4 py-7">
+        <button onClick={() => setView('converse')} className="px-4 mb-8 text-left" aria-label="GestureVoice home">
+          <Wordmark />
+        </button>
+        <nav aria-label="Primary" className="flex flex-col gap-2">
+          {NAV.map(({ id, label, icon: Icon, tint }) => (
+            <button
+              key={id}
+              onClick={() => setView(id)}
+              aria-current={view === id ? 'page' : undefined}
+              className="navitem"
+            >
+              <Icon className="w-7 h-7" strokeWidth={2.5} style={{ color: tint }} />
+              {label}
+            </button>
+          ))}
+          <button onClick={onOpenSettings} className="navitem">
+            <SlidersHorizontal className="w-7 h-7 text-ink-3" strokeWidth={2.5} />
+            Settings
+          </button>
+        </nav>
+        <div className="mt-auto px-2 flex flex-col gap-3">
+          <SpeakingBadge on={isSpeaking} />
+          <div className="flex items-center gap-1">{utilities}</div>
+        </div>
+      </aside>
+
+      {/* Mobile: top bar */}
+      <header className="lg:hidden sticky top-0 z-40 bg-paper border-b-2 border-rule">
+        <div className="h-16 px-4 flex items-center justify-between">
           <button onClick={() => setView('converse')} aria-label="GestureVoice home">
-            <Wordmark />
+            <span className="text-[1.5rem] leading-none font-black tracking-[-0.03em] text-signer">gesturevoice</span>
           </button>
-          <div className="hidden md:flex items-stretch">{nav}</div>
+          <div className="flex items-center gap-1">
+            <SpeakingBadge on={isSpeaking} />
+            {utilities}
+          </div>
         </div>
+      </header>
 
-        <div className="flex items-center gap-1">
-          <span
-            aria-live="polite"
-            className={`hidden sm:inline-flex items-center gap-2 mr-2 text-sm text-signer transition-opacity ${
-              isSpeaking ? 'opacity-100' : 'opacity-0'
-            }`}
-          >
-            <span className="speak-bars" aria-hidden="true">
-              <i />
-              <i />
-              <i />
-            </span>
-            {isSpeaking ? 'Speaking' : ''}
-          </span>
+      {/* Mobile: bottom tab bar */}
+      <nav
+        aria-label="Primary"
+        className="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-paper border-t-2 border-rule px-3 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] flex justify-around"
+      >
+        {NAV.map(({ id, label, icon: Icon, tint }) => (
           <button
-            onClick={toggleMute}
-            className="icon-btn"
-            aria-pressed={isMuted}
-            aria-label={isMuted ? 'Unmute voice' : 'Mute voice'}
-            title={isMuted ? 'Voice is muted' : 'Mute voice'}
+            key={id}
+            onClick={() => setView(id)}
+            aria-current={view === id ? 'page' : undefined}
+            aria-label={label}
+            className="w-14 h-12 inline-flex items-center justify-center rounded-[14px] border-2 border-transparent aria-[current=page]:bg-partner-soft aria-[current=page]:border-[var(--partner-line)]"
           >
-            {isMuted ? <VolumeX className="w-[18px] h-[18px] text-alert" /> : <Volume2 className="w-[18px] h-[18px]" />}
+            <Icon className="w-7 h-7" strokeWidth={2.5} style={{ color: tint }} />
           </button>
-          <button
-            onClick={toggleTheme}
-            className="icon-btn"
-            aria-label={isDark ? 'Use light theme' : 'Use dark theme'}
-            title={isDark ? 'Light theme' : 'Dark theme'}
-          >
-            {isDark ? <Sun className="w-[18px] h-[18px]" /> : <Moon className="w-[18px] h-[18px]" />}
-          </button>
-          <button onClick={onOpenSettings} className="icon-btn" aria-label="Voice and display settings" title="Settings">
-            <SlidersHorizontal className="w-[18px] h-[18px]" />
-          </button>
-        </div>
-      </div>
-
-      <div className="md:hidden border-t border-rule px-4 h-12 flex items-stretch">{nav}</div>
-    </header>
+        ))}
+        <button
+          onClick={onOpenSettings}
+          aria-label="Settings"
+          className="w-14 h-12 inline-flex items-center justify-center rounded-[14px] border-2 border-transparent"
+        >
+          <SlidersHorizontal className="w-7 h-7 text-ink-3" strokeWidth={2.5} />
+        </button>
+      </nav>
+    </>
   );
 };

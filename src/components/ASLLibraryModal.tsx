@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { Search, Volume2, Hand } from 'lucide-react';
+import { Mascot } from './Mascot';
 import { ASL_DICTIONARY } from '../data/aslDictionary';
 import { ASLSignItem, VoiceSettings } from '../types';
 import { speechManager } from '../services/speechSynthesis';
@@ -47,45 +48,49 @@ export const ASLLibraryModal: React.FC<ASLLibraryModalProps> = ({ onSelectPracti
   const detail = selected && (
     <article key={selected.id} className="arrive">
       <p className="eyebrow">{selected.category === 'alphabet' ? 'Fingerspelling' : selected.category === 'survival' ? 'Needs & urgent' : 'Everyday'}</p>
-      <div className="flex items-end gap-5 mt-2">
+      <div className="flex items-center gap-4 mt-2">
         {glyphOf(selected) && (
-          <span className="said text-[5.5rem] leading-[0.8] text-signer" aria-hidden="true">
+          <span
+            className="shrink-0 w-20 h-20 rounded-2xl bg-partner-soft border-2 border-b-4 border-[var(--partner-line)] inline-flex items-center justify-center text-[3rem] font-black text-partner-ink"
+            aria-hidden="true"
+          >
             {glyphOf(selected)}
           </span>
         )}
-        <h2 className="said text-[2.5rem] leading-[1] text-ink">{selected.name}</h2>
+        <h2 className="text-[2rem] font-black leading-[1.1] text-ink">{selected.name}</h2>
       </div>
-      <p className="mt-4 text-ink-2 text-[0.9375rem]">
-        Spoken as <span className="said italic text-[1.25rem] text-ink">“{selected.spokenEquivalent}”</span>
-      </p>
+      <div className="mt-5 flex items-center gap-3">
+        <Mascot size={52} className="shrink-0" />
+        <div className="bubble font-extrabold">“{selected.spokenEquivalent}”</div>
+      </div>
 
-      <dl className="mt-8 space-y-5 text-[0.9375rem]">
+      <dl className="mt-7 space-y-5 text-[1rem]">
         <div>
           <dt className="eyebrow mb-1.5">How to form it</dt>
-          <dd className="text-ink leading-relaxed">{selected.instruction}</dd>
+          <dd className="text-ink font-bold leading-relaxed">{selected.instruction}</dd>
         </div>
         <div>
           <dt className="eyebrow mb-1.5">Handshape</dt>
-          <dd className="text-ink-2 leading-relaxed">{selected.handshape}</dd>
+          <dd className="text-ink-2 font-bold leading-relaxed">{selected.handshape}</dd>
         </div>
         <div>
           <dt className="eyebrow mb-1.5">Movement</dt>
-          <dd className="text-ink-2 leading-relaxed">{selected.description}</dd>
+          <dd className="text-ink-2 font-bold leading-relaxed">{selected.description}</dd>
         </div>
         {selected.aslTip && (
           <div>
             <dt className="eyebrow mb-1.5">Tip</dt>
-            <dd className="text-ink-2 leading-relaxed">{selected.aslTip}</dd>
+            <dd className="text-ink-2 font-bold leading-relaxed">{selected.aslTip}</dd>
           </div>
         )}
       </dl>
 
-      <div className="mt-8 flex flex-wrap gap-2">
+      <div className="mt-8 grid grid-cols-2 gap-3">
         <button onClick={() => onSelectPracticeSign(selected.name)} className="btn btn-signer">
-          <Hand className="w-4 h-4" /> Practise with camera
+          <Hand className="w-5 h-5" strokeWidth={2.5} /> Practise
         </button>
         <button onClick={() => speechManager.speak(selected.spokenEquivalent, voiceSettings)} className="btn btn-line">
-          <Volume2 className="w-4 h-4" /> Hear it
+          <Volume2 className="w-5 h-5" strokeWidth={2.5} /> Hear it
         </button>
       </div>
     </article>
@@ -94,27 +99,27 @@ export const ASLLibraryModal: React.FC<ASLLibraryModalProps> = ({ onSelectPracti
   return (
     <div className="w-full">
       <header className="max-w-2xl">
-        <h1 className="said text-[2.75rem] sm:text-[3.5rem] leading-[1]">Signs</h1>
-        <p className="mt-3 text-ink-2 text-[1.0625rem]">
+        <h1 className="text-[2.25rem] sm:text-[2.75rem] font-black leading-[1.05]">Signs</h1>
+        <p className="mt-2 text-ink-2 font-bold text-[1.0625rem]">
           The signs GestureVoice understands, and how to make them. Pick one to practise it in front of the camera.
         </p>
       </header>
 
-      <div className="mt-8 flex flex-col-reverse sm:flex-row sm:items-center justify-between gap-4 border-b border-rule">
-        <nav aria-label="Filter signs" className="flex gap-6 h-11 overflow-x-auto">
+      <div className="mt-7 flex flex-col-reverse sm:flex-row sm:items-center justify-between gap-4">
+        <nav aria-label="Filter signs" className="flex gap-2 overflow-x-auto pb-1 -mb-1">
           {FILTERS.map((f) => (
             <button
               key={f.id}
               onClick={() => setFilter(f.id)}
               aria-current={filter === f.id ? 'page' : undefined}
-              className="navlink whitespace-nowrap"
+              className="chip"
             >
               {f.label}
             </button>
           ))}
         </nav>
-        <div className="relative sm:w-72 sm:mb-2">
-          <Search className="w-4 h-4 text-ink-3 absolute left-3.5 top-1/2 -translate-y-1/2" />
+        <div className="relative sm:w-72">
+          <Search className="w-5 h-5 text-ink-3 absolute left-3.5 top-1/2 -translate-y-1/2" strokeWidth={2.5} />
           <label htmlFor="sign-search" className="sr-only">
             Search signs
           </label>
@@ -124,7 +129,7 @@ export const ASLLibraryModal: React.FC<ASLLibraryModalProps> = ({ onSelectPracti
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search signs"
-            className="field !pl-10 !rounded-full"
+            className="field !pl-10"
           />
         </div>
       </div>
@@ -136,24 +141,22 @@ export const ASLLibraryModal: React.FC<ASLLibraryModalProps> = ({ onSelectPracti
           )}
 
           {words.length > 0 && (
-            <ul className="border-t border-rule">
+            <ul className="flex flex-col gap-2.5">
               {words.map((item) => {
                 const active = selected?.id === item.id;
                 return (
-                  <li key={item.id} className="border-b border-rule">
+                  <li key={item.id}>
                     <button
                       onClick={() => setSelectedId(item.id)}
                       aria-current={active ? 'true' : undefined}
-                      className={`w-full flex items-baseline justify-between gap-6 py-3.5 pl-3 pr-2 text-left transition-colors border-l-2 ${
-                        active ? 'border-signer bg-signer-soft/60' : 'border-transparent hover:bg-sunk/60'
-                      }`}
+                      className="tile w-full flex items-center justify-between gap-6 px-4 py-3 text-left"
                     >
-                      <span className="text-[1.0625rem] font-medium text-ink">{item.name}</span>
-                      <span className="said italic text-[1.0625rem] text-ink-3 truncate max-w-[55%] text-right">
+                      <span className="text-[1.0625rem] font-extrabold">{item.name}</span>
+                      <span className="hidden sm:block text-[0.9375rem] font-bold text-ink-3 truncate max-w-[55%] text-right">
                         {item.spokenEquivalent}
                       </span>
                     </button>
-                    {active && <div className="lg:hidden px-3 pt-4 pb-8">{detail}</div>}
+                    {active && <div className="lg:hidden sheet p-5 mt-2 mb-3">{detail}</div>}
                   </li>
                 );
               })}
@@ -162,8 +165,8 @@ export const ASLLibraryModal: React.FC<ASLLibraryModalProps> = ({ onSelectPracti
 
           {letters.length > 0 && (
             <div className={words.length ? 'mt-10' : ''}>
-              <h3 className="eyebrow mb-3">Alphabet</h3>
-              <div className="grid grid-cols-6 sm:grid-cols-8 border-t border-l border-rule">
+              <h3 className="text-[1.375rem] font-black mb-3">Alphabet</h3>
+              <div className="grid grid-cols-3 sm:grid-cols-5 gap-3">
                 {letters.map((item) => {
                   const active = selected?.id === item.id;
                   return (
@@ -172,22 +175,21 @@ export const ASLLibraryModal: React.FC<ASLLibraryModalProps> = ({ onSelectPracti
                       onClick={() => setSelectedId(item.id)}
                       aria-label={item.name}
                       aria-current={active ? 'true' : undefined}
-                      className={`aspect-square said text-[2rem] border-r border-b border-rule transition-colors ${
-                        active ? 'bg-signer text-on-accent' : 'bg-sheet text-ink hover:bg-sunk'
-                      }`}
+                      className="tile aspect-[4/5] flex flex-col items-center justify-center gap-2"
                     >
-                      {glyphOf(item)}
+                      <span className="text-[3rem] font-black leading-none text-partner">{glyphOf(item)}</span>
+                      <span className="text-sm font-extrabold text-ink-2">letter {glyphOf(item)?.toLowerCase()}</span>
                     </button>
                   );
                 })}
               </div>
-              {selected && glyphOf(selected) && <div className="lg:hidden pt-8">{detail}</div>}
+              {selected && glyphOf(selected) && <div className="lg:hidden sheet p-5 mt-4">{detail}</div>}
             </div>
           )}
         </div>
 
-        <aside className="hidden lg:block lg:col-span-5 lg:sticky lg:top-[96px]">
-          <div className="sheet p-8">{detail}</div>
+        <aside className="hidden lg:block lg:col-span-5 lg:sticky lg:top-10">
+          <div className="sheet p-7">{detail}</div>
         </aside>
       </div>
     </div>

@@ -8,8 +8,10 @@ import {
   EyeOff,
   Hand,
   X,
+  Check,
 } from 'lucide-react';
 import { GestureTranslation, VoiceSettings } from '../types';
+import { Mascot } from './Mascot';
 import { speechManager, soundEffects } from '../services/speechSynthesis';
 import { QUICK_EMERGENCY_PHRASES } from '../data/aslDictionary';
 import { SAMPLE_GESTURES, SampleGesture } from '../data/sampleGestures';
@@ -112,7 +114,7 @@ const VIRTUAL_SIGNS: VirtualSignModel[] = [
       ctx.translate(320, 240);
       ctx.rotate(waveAngle);
       // Forearm & wrist
-      ctx.fillStyle = '#cdbfa6';
+      ctx.fillStyle = '#58cc02';
       ctx.beginPath();
       ctx.roundRect(-24, 70, 48, 120, 16);
       ctx.fill();
@@ -149,7 +151,7 @@ const VIRTUAL_SIGNS: VirtualSignModel[] = [
     drawHand: (ctx) => {
       ctx.save();
       ctx.translate(320, 240);
-      ctx.fillStyle = '#cdbfa6';
+      ctx.fillStyle = '#58cc02';
       // Palm
       ctx.beginPath();
       ctx.roundRect(-38, -25, 76, 100, 22);
@@ -184,7 +186,7 @@ const VIRTUAL_SIGNS: VirtualSignModel[] = [
     drawHand: (ctx) => {
       ctx.save();
       ctx.translate(320, 240);
-      ctx.fillStyle = '#cdbfa6';
+      ctx.fillStyle = '#58cc02';
       // Palm
       ctx.beginPath();
       ctx.roundRect(-36, -15, 72, 90, 20);
@@ -227,7 +229,7 @@ const VIRTUAL_SIGNS: VirtualSignModel[] = [
     drawHand: (ctx) => {
       ctx.save();
       ctx.translate(320, 240);
-      ctx.fillStyle = '#cdbfa6';
+      ctx.fillStyle = '#58cc02';
       // Fist body
       ctx.beginPath();
       ctx.roundRect(-40, -15, 80, 80, 22);
@@ -250,13 +252,13 @@ const VIRTUAL_SIGNS: VirtualSignModel[] = [
       const nodOffset = Math.sin(t * 0.007) * 20;
       ctx.save();
       ctx.translate(320, 240 + nodOffset);
-      ctx.fillStyle = '#cdbfa6';
+      ctx.fillStyle = '#58cc02';
       // Fist
       ctx.beginPath();
       ctx.roundRect(-42, -35, 84, 85, 24);
       ctx.fill();
       // Curled finger lines
-      ctx.strokeStyle = '#a8987c';
+      ctx.strokeStyle = '#46a302';
       ctx.lineWidth = 4;
       ctx.beginPath();
       ctx.moveTo(-35, -5);
@@ -282,7 +284,7 @@ const VIRTUAL_SIGNS: VirtualSignModel[] = [
       const forwardOffset = (Math.sin(t * 0.005) + 1) * 30;
       ctx.save();
       ctx.translate(320, 220 + forwardOffset);
-      ctx.fillStyle = '#cdbfa6';
+      ctx.fillStyle = '#58cc02';
       // Palm
       ctx.beginPath();
       ctx.roundRect(-36, -30, 72, 90, 20);
@@ -310,7 +312,7 @@ const VIRTUAL_SIGNS: VirtualSignModel[] = [
     drawHand: (ctx) => {
       ctx.save();
       ctx.translate(320, 240);
-      ctx.fillStyle = '#cdbfa6';
+      ctx.fillStyle = '#58cc02';
       // Palm base
       ctx.beginPath();
       ctx.roundRect(-35, -15, 70, 85, 20);
@@ -322,7 +324,7 @@ const VIRTUAL_SIGNS: VirtualSignModel[] = [
         ctx.fill();
       });
       // Pinched loop (thumb + index)
-      ctx.strokeStyle = '#cdbfa6';
+      ctx.strokeStyle = '#58cc02';
       ctx.lineWidth = 14;
       ctx.beginPath();
       ctx.arc(-22, -18, 22, 0, Math.PI * 2);
@@ -340,7 +342,7 @@ const VIRTUAL_SIGNS: VirtualSignModel[] = [
     drawHand: (ctx) => {
       ctx.save();
       ctx.translate(320, 240);
-      ctx.fillStyle = '#cdbfa6';
+      ctx.fillStyle = '#58cc02';
       // Palm
       ctx.beginPath();
       ctx.roundRect(-35, -20, 70, 80, 20);
@@ -370,7 +372,7 @@ const VIRTUAL_SIGNS: VirtualSignModel[] = [
     drawHand: (ctx) => {
       ctx.save();
       ctx.translate(320, 240);
-      ctx.fillStyle = '#cdbfa6';
+      ctx.fillStyle = '#58cc02';
       // Closed fist base
       ctx.beginPath();
       ctx.roundRect(-36, -20, 72, 85, 22);
@@ -396,7 +398,7 @@ const VIRTUAL_SIGNS: VirtualSignModel[] = [
     drawHand: (ctx) => {
       ctx.save();
       ctx.translate(320, 240);
-      ctx.fillStyle = '#cdbfa6';
+      ctx.fillStyle = '#58cc02';
       // Palm
       ctx.beginPath();
       ctx.roundRect(-35, -15, 70, 85, 20);
@@ -648,11 +650,11 @@ export const CameraTranslator: React.FC<CameraTranslatorProps> = ({
       canvas.height = 480;
 
       // Dark virtual studio background
-      ctx.fillStyle = '#1a1916';
+      ctx.fillStyle = '#131f24';
       ctx.fillRect(0, 0, 640, 480);
 
       // Grid guide lines
-      ctx.strokeStyle = '#24221e';
+      ctx.strokeStyle = '#1c2b32';
       ctx.lineWidth = 1;
       for (let x = 40; x < 640; x += 40) {
         ctx.beginPath();
@@ -1301,7 +1303,7 @@ export const CameraTranslator: React.FC<CameraTranslatorProps> = ({
   };
 
   const hasSource = streamActive || isVirtualCamera;
-  const confidenceWord: Record<string, string> = { high: 'Confident', medium: 'Fairly sure', low: 'Unsure' };
+  const confidenceWord: Record<string, string> = { high: 'Sure', medium: 'Fairly sure', low: 'Unsure' };
   const handLabel = activeGesture && activeGesture.id !== 'standby' ? humanize(activeGesture.name) : null;
   const showCaption = latestTranslation?.spokenText && (hasSource || staticPreviewImage);
 
@@ -1328,18 +1330,23 @@ export const CameraTranslator: React.FC<CameraTranslatorProps> = ({
 
       <div className="flex flex-col gap-4">
         {practiceFocus && (
-          <div className="flex items-center justify-between gap-4 pl-4 pr-2 py-2 rounded-xl bg-signer-soft text-ink">
-            <p className="text-[0.9375rem]">
-              Practising <span className="font-semibold">{practiceFocus}</span>. Make the sign, then read it.
+          <div className="tile !border-b-2 flex items-center gap-4 pl-3 pr-2 py-2">
+            <Mascot size={44} mood="listening" />
+            <p className="flex-1 text-[1rem] font-bold">
+              Let’s practise <span className="text-signer-ink">{practiceFocus}</span>! Make the sign, then tap Read sign.
             </p>
-            <button onClick={clearPracticeFocus} className="btn btn-sm btn-quiet">
-              Stop
+            <button onClick={clearPracticeFocus} className="icon-btn" aria-label="Stop practising">
+              <X className="w-6 h-6" strokeWidth={3} />
             </button>
           </div>
         )}
 
-        {/* The stage — always dark, it is a camera */}
-        <figure className="relative m-0 w-full aspect-[4/5] sm:aspect-[16/10] rounded-[20px] overflow-hidden bg-[#161512] text-[#f3efe6]">
+        {/* The stage — dark while showing a picture, light while inviting */}
+        <figure
+          className={`relative m-0 w-full aspect-[4/5] sm:aspect-[16/10] rounded-[20px] overflow-hidden border-2 border-b-4 ${
+            hasSource || staticPreviewImage ? 'bg-[var(--stage)] text-white border-[var(--stage)]' : 'bg-sunk text-ink border-rule'
+          }`}
+        >
           <video
             ref={videoRef}
             autoPlay
@@ -1364,55 +1371,39 @@ export const CameraTranslator: React.FC<CameraTranslatorProps> = ({
             <img
               src={staticPreviewImage}
               alt="The image being read"
-              className="absolute inset-0 w-full h-full object-contain bg-[#161512]"
+              className="absolute inset-0 w-full h-full object-contain bg-[var(--stage)]"
             />
           )}
 
           {/* Idle — the invitation */}
           {!hasSource && !staticPreviewImage && (
-            <div className="absolute inset-0 flex flex-col justify-end p-6 sm:p-10">
-              <svg
-                className="absolute right-10 top-10 w-36 opacity-[0.18] hidden sm:block"
-                viewBox="0 0 120 140"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                aria-hidden="true"
-              >
-                <path d="M38 132 C24 112 18 96 20 82 L22 62 C23 55 32 54 34 61 L37 76 L36 26 C36 18 47 18 47 26 L48 66 L50 14 C50 6 62 6 62 14 L62 64 L65 22 C65 14 77 14 77 22 L76 68 L81 40 C82 32 93 33 92 41 L88 84 C86 106 80 120 72 132" />
-              </svg>
-              <p className="said text-[2.5rem] sm:text-[3.5rem] leading-[1]">Sign, and be heard.</p>
-              <p className="mt-3 max-w-md text-[0.9375rem] text-[#b9b4a6]">
-                Turn on your camera and sign toward it. Each sign is read, spoken aloud, and added to the conversation.
-              </p>
-              <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-3">
-                <button
-                  onClick={startCamera}
-                  disabled={isConnectingCamera}
-                  className="btn bg-[#f3efe6] text-[#1b1a16] hover:bg-white"
-                >
-                  <Camera className="w-4 h-4" />
-                  {isConnectingCamera ? 'Starting camera…' : isPermissionDenied ? 'Try camera again' : 'Turn on camera'}
+            <div className="absolute inset-0 flex flex-col items-center justify-center gap-6 p-6 text-center">
+              <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
+                <Mascot size={120} className="bob" />
+                <div className="bubble sm:text-left text-[1.125rem] font-extrabold max-w-[18rem] max-sm:before:hidden max-sm:after:hidden">
+                  Sign to me and I’ll say it out loud!
+                </div>
+              </div>
+              <div className="flex flex-col items-stretch gap-3 w-full max-w-sm">
+                <button onClick={startCamera} disabled={isConnectingCamera} className="btn btn-signer">
+                  <Camera className="w-5 h-5" strokeWidth={2.5} />
+                  {isConnectingCamera ? 'Starting…' : isPermissionDenied ? 'Try again' : 'Turn on camera'}
                 </button>
-                <button onClick={startVirtualCamera} className="text-[0.9375rem] font-medium underline underline-offset-4 decoration-[#5c584e] hover:decoration-current">
-                  Try the simulator
-                </button>
-                <button onClick={() => fileInputRef.current?.click()} className="text-[0.9375rem] font-medium underline underline-offset-4 decoration-[#5c584e] hover:decoration-current">
-                  Use a photo
-                </button>
+                <div className="grid grid-cols-2 gap-3">
+                  <button onClick={startVirtualCamera} className="btn btn-line btn-sm !min-h-11">
+                    Simulator
+                  </button>
+                  <button onClick={() => fileInputRef.current?.click()} className="btn btn-line btn-sm !min-h-11">
+                    Use a photo
+                  </button>
+                </div>
               </div>
               {(cameraError || isPermissionDenied) && (
-                <div className="mt-6 max-w-md text-sm text-[#f0b8a4] border-l-2 border-[#e6936f] pl-3">
-                  {isPermissionDenied ? (
-                    <>
-                      Camera access is blocked. Open the site settings from the lock icon in the address bar,
-                      allow Camera, then try again.
-                    </>
-                  ) : (
-                    cameraError
-                  )}
-                </div>
+                <p className="max-w-md text-sm font-bold text-alert">
+                  {isPermissionDenied
+                    ? 'Camera access is blocked. Open site settings from the lock icon in the address bar, allow Camera, then try again.'
+                    : cameraError}
+                </p>
               )}
             </div>
           )}
@@ -1420,10 +1411,10 @@ export const CameraTranslator: React.FC<CameraTranslatorProps> = ({
           {/* Status, top-left */}
           {stageStatus && (
             <div className="absolute top-0 inset-x-0 flex items-start justify-between p-3 sm:p-4 bg-gradient-to-b from-black/45 to-transparent">
-              <span className="inline-flex items-center gap-2 text-sm font-medium">
+              <span className="inline-flex items-center gap-2 text-sm font-extrabold">
                 <span
-                  className={stageStatus.tone === 'idle' ? 'w-2 h-2 rounded-full bg-[#868174]' : 'live-dot'}
-                  style={{ color: stageStatus.tone === 'found' ? '#7cc1a0' : '#f3efe6' }}
+                  className={stageStatus.tone === 'idle' ? 'w-2.5 h-2.5 rounded-full bg-white/50' : 'live-dot'}
+                  style={{ color: stageStatus.tone === 'found' ? '#93d333' : '#ffffff' }}
                   aria-hidden="true"
                 />
                 <span aria-live="polite">{stageStatus.text}</span>
@@ -1488,7 +1479,7 @@ export const CameraTranslator: React.FC<CameraTranslatorProps> = ({
               key={latestTranslation!.timestamp}
               className="arrive absolute bottom-0 inset-x-0 px-4 sm:px-6 pt-16 pb-5 bg-gradient-to-t from-black/75 via-black/40 to-transparent"
             >
-              <p className="said text-[1.75rem] sm:text-[2.25rem] leading-[1.1] max-w-[24ch]">
+              <p className="text-[1.5rem] sm:text-[2rem] font-extrabold leading-[1.15] max-w-[24ch] drop-shadow">
                 {latestTranslation!.spokenText}
               </p>
             </figcaption>
@@ -1498,35 +1489,36 @@ export const CameraTranslator: React.FC<CameraTranslatorProps> = ({
         </figure>
 
         {/* Controls */}
-        <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3">
-          <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-4">
+          <div className="flex items-center gap-3 w-full sm:w-auto">
             <button
               onClick={performManualTranslation}
               disabled={!hasSource || isProcessingFrame}
-              className="btn btn-signer !min-h-12 !px-6 text-base"
+              className="btn btn-signer !min-h-[3.25rem] !px-7 !text-base flex-1 sm:flex-none"
             >
-              <Hand className="w-[18px] h-[18px]" />
+              <Hand className="w-5 h-5" strokeWidth={2.5} />
               {isProcessingFrame ? 'Reading…' : 'Read sign'}
             </button>
             {latestTranslation?.spokenText && (
               <button
                 onClick={() => speechManager.speak(latestTranslation.spokenText, voiceSettings)}
-                className="btn btn-line"
+                className="btn btn-line !min-h-[3.25rem] !px-4"
                 aria-label="Say the last sign again"
+                title="Say again"
               >
-                <Volume2 className="w-4 h-4" /> Say again
+                <Volume2 className="w-5 h-5" strokeWidth={2.5} />
               </button>
             )}
           </div>
 
           <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3 w-full sm:w-auto">
             {isVirtualCamera && (
-              <label className="flex items-center gap-2 text-sm text-ink-2">
+              <label className="flex items-center gap-2 text-sm font-bold text-ink-2">
                 Simulate
                 <select
                   value={selectedVirtualSign}
                   onChange={(e) => setSelectedVirtualSign(e.target.value)}
-                  className="field !min-h-9 !w-auto !py-0 !pl-3 !pr-8 text-sm"
+                  className="field !min-h-10 !w-auto !py-0 !pl-3 !pr-8 text-sm"
                 >
                   {VIRTUAL_SIGNS.map((s) => (
                     <option key={s.id} value={s.id}>
@@ -1538,8 +1530,8 @@ export const CameraTranslator: React.FC<CameraTranslatorProps> = ({
             )}
             <label className={`flex items-center gap-3 ${hasSource ? '' : 'opacity-45'}`}>
               <span className="leading-tight">
-                <span className="block text-sm font-medium text-ink">Keep reading</span>
-                <span className="block text-xs text-ink-3">every 4 seconds</span>
+                <span className="block text-[0.9375rem] font-extrabold text-ink">Keep reading</span>
+                <span className="block text-xs font-bold text-ink-3">every 4 seconds</span>
               </span>
               <button
                 role="switch"
@@ -1553,22 +1545,40 @@ export const CameraTranslator: React.FC<CameraTranslatorProps> = ({
           </div>
         </div>
 
-        {latestTranslation && (latestTranslation.description || latestTranslation.aslTip || !latestTranslation.detected) && (
-          <div className="text-[0.9375rem] text-ink-2 border-l-2 border-rule-strong pl-4 space-y-1">
-            {latestTranslation.detected && latestTranslation.gestureName !== 'QUICK_SPEECH' && (
-              <p className="text-sm text-ink-3">
-                Read as <span className="text-ink font-medium">{humanize(latestTranslation.gestureName)}</span>
-                {' · '}
-                {confidenceWord[latestTranslation.confidence] ?? latestTranslation.confidence}
-                {translationLatencyMs ? <span className="tnum"> · {(translationLatencyMs / 1000).toFixed(1)}s</span> : null}
+        {/* Result feedback — lesson-style banner */}
+        {latestTranslation && latestTranslation.gestureName !== 'QUICK_SPEECH' && (
+          <div
+            key={latestTranslation.timestamp}
+            className={`arrive rounded-2xl px-5 py-4 flex items-start gap-4 ${
+              latestTranslation.detected ? 'bg-signer-soft' : 'bg-[#ffdfe0] dark:bg-[#3a1d1f]'
+            }`}
+          >
+            <span
+              className={`shrink-0 w-10 h-10 rounded-full inline-flex items-center justify-center text-white ${
+                latestTranslation.detected ? 'bg-signer' : 'bg-alert'
+              }`}
+              aria-hidden="true"
+            >
+              {latestTranslation.detected ? <Check className="w-6 h-6" strokeWidth={4} /> : <X className="w-6 h-6" strokeWidth={4} />}
+            </span>
+            <div className="min-w-0">
+              {latestTranslation.detected ? (
+                <p className="text-[1.25rem] font-black text-signer-ink">
+                  {humanize(latestTranslation.gestureName)}
+                  <span className="ml-2 text-sm font-extrabold uppercase tracking-wider opacity-80">
+                    {confidenceWord[latestTranslation.confidence] ?? latestTranslation.confidence}
+                    {translationLatencyMs ? <span className="tnum"> · {(translationLatencyMs / 1000).toFixed(1)}s</span> : null}
+                  </span>
+                </p>
+              ) : (
+                <p className="text-[1.25rem] font-black text-alert">No sign found</p>
+              )}
+              <p className={`text-[0.9375rem] font-bold mt-0.5 ${latestTranslation.detected ? 'text-signer-ink' : 'text-alert'}`}>
+                {latestTranslation.detected
+                  ? latestTranslation.aslTip ?? latestTranslation.description
+                  : 'Keep your hand inside the frame and try again.'}
               </p>
-            )}
-            {!latestTranslation.detected && <p>No sign recognised. Keep your hand inside the frame and try again.</p>}
-            {latestTranslation.aslTip && (
-              <p>
-                <span className="font-medium text-ink">Tip</span> — {latestTranslation.aslTip}
-              </p>
-            )}
+            </div>
           </div>
         )}
       </div>
@@ -1576,21 +1586,19 @@ export const CameraTranslator: React.FC<CameraTranslatorProps> = ({
       {/* Phrases the signer can say instantly */}
       <section aria-labelledby="quick-phrases">
         <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 mb-3">
-          <h3 id="quick-phrases" className="eyebrow">Say it now</h3>
-          <span className="text-xs text-ink-3">Spoken immediately, no signing needed</span>
+          <h3 id="quick-phrases" className="text-[1.375rem] font-black">Say it now</h3>
+          <span className="text-sm font-bold text-ink-3">Spoken instantly, no signing needed</span>
         </div>
-        <ul className="grid grid-cols-1 sm:grid-cols-2 border-t border-rule">
+        <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {QUICK_EMERGENCY_PHRASES.map((phrase, idx) => (
-            <li key={idx} className="border-b border-rule sm:odd:border-r sm:odd:pr-4 sm:even:pl-4">
+            <li key={idx}>
               <button
                 onClick={() => handleQuickSpeak(phrase.text)}
-                className="group w-full flex items-center justify-between gap-3 py-3 text-left"
+                className="tile group w-full flex items-center justify-between gap-3 px-4 py-3.5 text-left"
                 title={phrase.text}
               >
-                <span className="text-[0.9375rem] text-ink group-hover:text-signer transition-colors">
-                  {phrase.label}
-                </span>
-                <Volume2 className="w-4 h-4 text-ink-3 opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100 transition-opacity shrink-0" />
+                <span className="text-[1rem] font-extrabold">{phrase.label}</span>
+                <Volume2 className="w-5 h-5 text-partner shrink-0" strokeWidth={2.5} />
               </button>
             </li>
           ))}
@@ -1600,22 +1608,25 @@ export const CameraTranslator: React.FC<CameraTranslatorProps> = ({
       {/* Sample signs — for trying it without a camera */}
       <section aria-labelledby="samples">
         <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 mb-3">
-          <h3 id="samples" className="eyebrow">No camera? Read a sample</h3>
+          <h3 id="samples" className="text-[1.375rem] font-black">No camera? Try a sample</h3>
           {onSwitchToVideoUpload && (
-            <button onClick={onSwitchToVideoUpload} className="text-sm text-ink-2 hover:text-ink underline underline-offset-4 decoration-rule-strong">
-              Translate a video instead
+            <button onClick={onSwitchToVideoUpload} className="btn btn-sm btn-quiet -mr-3">
+              Translate a video
             </button>
           )}
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="grid grid-cols-3 sm:grid-cols-6 gap-3">
           {SAMPLE_GESTURES.map((sample) => (
             <button
               key={sample.id}
               onClick={() => handleSelectSampleGesture(sample)}
-              className="btn btn-sm btn-line !font-medium"
+              className="tile flex flex-col items-center justify-center gap-1 px-2 pt-4 pb-3 text-center"
               title={sample.description}
             >
-              {sample.name}
+              <span className="text-[2.25rem] font-black leading-none text-partner">
+                {sample.name.replace(/^Letter\s+/i, '').charAt(0)}
+              </span>
+              <span className="text-[0.8125rem] font-extrabold text-ink-2 leading-tight">{sample.name}</span>
             </button>
           ))}
         </div>

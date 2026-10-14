@@ -61,7 +61,7 @@ export default function App() {
     else delete root.dataset.contrast;
     document
       .querySelector('meta[name="theme-color"]')
-      ?.setAttribute('content', highContrast ? '#ffffff' : isDark ? '#151412' : '#F3EFE6');
+      ?.setAttribute('content', highContrast ? '#ffffff' : isDark ? '#131f24' : '#ffffff');
   }, [themePref, highContrast, isDark]);
 
   useEffect(() => speechManager.subscribeSpeaking(setIsSpeaking), []);
@@ -149,7 +149,8 @@ export default function App() {
         onOpenSettings={() => setSettingsOpen(true)}
       />
 
-      <main id="main" className="flex-1 w-full max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
+      <main id="main" className="flex-1 w-full lg:pl-[248px] pb-24 lg:pb-0">
+        <div className="max-w-[1180px] mx-auto px-4 sm:px-6 lg:px-10 py-6 lg:py-10">
         {view === 'converse' && (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
             <section aria-label="Signer" className="lg:col-span-7 min-w-0">
@@ -165,7 +166,7 @@ export default function App() {
             </section>
             <section
               aria-label="Conversation"
-              className="lg:col-span-5 min-w-0 lg:sticky lg:top-[88px] lg:h-[calc(100vh-112px)]"
+              className="lg:col-span-5 min-w-0 lg:sticky lg:top-10 lg:h-[calc(100vh-80px)]"
             >
               <TwoWayTranscript
                 messages={messages}
@@ -191,6 +192,7 @@ export default function App() {
         {view === 'signs' && (
           <ASLLibraryModal onSelectPracticeSign={handleSelectPracticeSign} voiceSettings={voiceSettings} />
         )}
+        </div>
       </main>
 
       <SettingsModal

@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { VoiceSettings, VideoTranslationResult, VideoSignSegment } from '../types';
 import { speechManager, soundEffects } from '../services/speechSynthesis';
+import { Mascot } from './Mascot';
 import {
   handTracker,
   drawHandSkeleton,
@@ -166,13 +167,13 @@ export const VideoTranslator: React.FC<VideoTranslatorProps> = ({
 
         // Draw background
         const grad = ctx.createLinearGradient(0, 0, 640, 360);
-        grad.addColorStop(0, '#1a1916');
-        grad.addColorStop(1, '#22201c');
+        grad.addColorStop(0, '#131f24');
+        grad.addColorStop(1, '#1a2a31');
         ctx.fillStyle = grad;
         ctx.fillRect(0, 0, 640, 360);
 
         // Signer avatar silhouette
-        ctx.fillStyle = '#2e2c27';
+        ctx.fillStyle = '#37464f';
         ctx.beginPath();
         ctx.arc(320, 110, 50, 0, Math.PI * 2);
         ctx.fill();
@@ -220,11 +221,11 @@ export const VideoTranslator: React.FC<VideoTranslatorProps> = ({
         // Overlay text banner
         ctx.fillStyle = 'rgba(0, 0, 0, 0)';
         ctx.fillRect(20, 20, 600, 48);
-        ctx.fillStyle = '#b9b4a6';
-        ctx.font = '600 15px "Instrument Sans", sans-serif';
+        ctx.fillStyle = '#b4c1c8';
+        ctx.font = '800 16px Nunito, sans-serif';
         ctx.fillText(`Demo signer · ${signName}`, 35, 50);
 
-        ctx.fillStyle = '#868174';
+        ctx.fillStyle = '#6f8590';
         ctx.font = '12px "JetBrains Mono", monospace';
         ctx.fillText(`${timeSec.toFixed(1)}s`, 480, 50);
 
@@ -736,14 +737,14 @@ ${translationResult.segments
       />
 
       <header className="max-w-2xl">
-        <h1 className="said text-[2.75rem] sm:text-[3.5rem] leading-[1]">Video</h1>
-        <p className="mt-3 text-ink-2 text-[1.0625rem]">
+        <h1 className="text-[2.25rem] sm:text-[2.75rem] font-black leading-[1.05]">Video</h1>
+        <p className="mt-2 text-ink-2 font-bold text-[1.0625rem]">
           Translate a recording of someone signing into a written transcript, captions, and a spoken voiceover.
         </p>
       </header>
 
       {errorMsg && (
-        <p role="alert" className="mt-6 text-[0.9375rem] text-alert border-l-2 border-alert pl-3">
+        <p role="alert" className="mt-6 rounded-2xl px-5 py-4 font-extrabold text-alert bg-[#ffdfe0] dark:bg-[#3a1d1f]">
           {errorMsg}
         </p>
       )}
@@ -753,30 +754,33 @@ ${translationResult.segments
           <div
             onDragOver={(e) => e.preventDefault()}
             onDrop={handleDrop}
-            className="lg:col-span-8 rounded-[20px] border-2 border-dashed border-rule-strong bg-sheet min-h-[340px] flex flex-col items-center justify-center text-center px-6 py-12"
+            className="lg:col-span-8 rounded-[20px] border-2 border-dashed border-rule-strong bg-sunk min-h-[360px] flex flex-col items-center justify-center text-center px-6 py-12"
           >
-            <p className="said text-[2rem]">Drop a video here</p>
-            <p className="mt-2 text-ink-3 text-[0.9375rem]">MP4, WebM or MOV. Shorter clips translate faster.</p>
+            <span className="w-20 h-20 rounded-[22px] bg-[#f3e1ff] dark:bg-[#3a2a4a] inline-flex items-center justify-center mb-5">
+              <Upload className="w-10 h-10 text-[#ce82ff]" strokeWidth={2.5} />
+            </span>
+            <p className="text-[1.5rem] font-black">Drop a video here</p>
+            <p className="mt-1 text-ink-3 font-bold text-[0.9375rem]">MP4, WebM or MOV. Shorter clips translate faster.</p>
             <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-              <button onClick={() => fileInputRef.current?.click()} className="btn btn-ink">
-                <Upload className="w-4 h-4" /> Choose a video
+              <button onClick={() => fileInputRef.current?.click()} className="btn btn-signer">
+                Choose a video
               </button>
               <button onClick={handleLoadDemoVideo} className="btn btn-line">
                 Use a demo clip
               </button>
             </div>
           </div>
-          <dl className="lg:col-span-4 space-y-6 text-[0.9375rem] lg:pt-4">
+          <dl className="lg:col-span-4 flex flex-col gap-3">
             {[
               ['A transcript', 'The whole video as readable text, which you can correct before sharing.'],
               ['Captions', 'Timed subtitles you can export as .srt or .vtt.'],
               ['A voiceover', 'Each sign spoken aloud in time with the video.'],
             ].map(([t, d], i) => (
-              <div key={t} className="flex gap-4">
-                <span className="said text-[1.5rem] leading-none text-ink-3 w-5 shrink-0">{i + 1}</span>
+              <div key={t} className="tile flex gap-4 p-4">
+                <span className="w-9 h-9 shrink-0 rounded-xl bg-sun text-white font-black inline-flex items-center justify-center">{i + 1}</span>
                 <div>
-                  <dt className="font-semibold text-ink">{t}</dt>
-                  <dd className="text-ink-2 mt-0.5">{d}</dd>
+                  <dt className="font-black text-ink">{t}</dt>
+                  <dd className="text-ink-2 font-bold text-[0.9375rem] mt-0.5">{d}</dd>
                 </div>
               </div>
             ))}
@@ -786,7 +790,7 @@ ${translationResult.segments
         <div className="mt-8 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start">
           {/* Player */}
           <div className="lg:col-span-6 min-w-0 flex flex-col gap-4">
-            <figure className="relative m-0 w-full aspect-video rounded-[20px] overflow-hidden bg-[#161512] text-[#f3efe6]">
+            <figure className="relative m-0 w-full aspect-video rounded-[20px] overflow-hidden bg-[var(--stage)] text-white border-2 border-b-4 border-[var(--stage)]">
               <video
                 ref={videoRef}
                 src={videoUrl}
@@ -805,7 +809,7 @@ ${translationResult.segments
               <canvas ref={canvasRef} className="absolute inset-0 w-full h-full pointer-events-none object-contain" />
               {showSubtitles && activeSubtitle && (
                 <figcaption className="absolute bottom-14 inset-x-0 text-center px-6 pointer-events-none">
-                  <span className="said text-[1.5rem] sm:text-[1.75rem] leading-snug px-2 bg-black/60 [box-decoration-break:clone]">
+                  <span className="text-[1.25rem] sm:text-[1.5rem] font-extrabold leading-snug px-3 py-1 rounded-lg bg-black/70 [box-decoration-break:clone]">
                     {activeSubtitle.spokenText}
                   </span>
                 </figcaption>
@@ -814,16 +818,16 @@ ${translationResult.segments
             </figure>
 
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <p className="text-sm text-ink-3 truncate min-w-0">
+              <p className="text-sm font-bold text-ink-3 truncate min-w-0">
                 {videoFile?.name ?? 'Demo clip'}
                 {videoDuration > 0 && <span className="tnum"> · {fmt(videoDuration)}</span>}
               </p>
               <div className="flex items-center gap-4 text-sm">
-                <label className="flex items-center gap-2 text-ink-2">
+                <label className="flex items-center gap-2 font-bold text-ink-2">
                   <button role="switch" aria-checked={showSubtitles} onClick={() => setShowSubtitles(!showSubtitles)} className="switch scale-[0.8] origin-right" />
                   Captions
                 </label>
-                <label className="flex items-center gap-2 text-ink-2">
+                <label className="flex items-center gap-2 font-bold text-ink-2">
                   <button role="switch" aria-checked={showSkeleton} onClick={() => setShowSkeleton(!showSkeleton)} className="switch scale-[0.8] origin-right" />
                   Hand outline
                 </label>
@@ -832,7 +836,7 @@ ${translationResult.segments
 
             {!translationResult && (
               <div className="flex flex-wrap items-center gap-3">
-                <button onClick={handleTranslateVideo} disabled={isProcessing} className="btn btn-signer !min-h-12 !px-6 text-base">
+                <button onClick={handleTranslateVideo} disabled={isProcessing} className="btn btn-signer !min-h-[3.25rem] !px-7 !text-base">
                   {isProcessing ? 'Translating…' : 'Translate video'}
                 </button>
                 <button onClick={resetVideo} disabled={isProcessing} className="btn btn-quiet">
@@ -843,10 +847,10 @@ ${translationResult.segments
 
             {isProcessing && (
               <div aria-live="polite">
-                <div className="h-[3px] bg-rule rounded-full overflow-hidden">
-                  <div className="h-full bg-signer transition-[width] duration-500" style={{ width: `${processingProgress}%` }} />
+                <div className="progress">
+                  <span style={{ width: `${Math.max(6, processingProgress)}%` }} />
                 </div>
-                <p className="mt-2 text-sm text-ink-2 flex justify-between gap-4">
+                <p className="mt-2 text-sm font-bold text-ink-2 flex justify-between gap-4">
                   <span>{processingStep}</span>
                   <span className="tnum text-ink-3">{Math.round(processingProgress)}%</span>
                 </p>
@@ -857,17 +861,22 @@ ${translationResult.segments
           {/* Result */}
           <div className="lg:col-span-6 min-w-0">
             {!translationResult ? (
-              <div className="sheet p-8 text-ink-2">
-                <p className="said text-[1.75rem] text-ink">The transcript will appear here.</p>
-                <p className="mt-3 text-[0.9375rem]">
+              <div className="sheet p-7 text-ink-2">
+                <div className="flex items-center gap-4">
+                  <Mascot size={64} mood={isProcessing ? 'thinking' : 'happy'} className="bob shrink-0" />
+                  <div className="bubble font-extrabold text-ink">
+                    {isProcessing ? 'Watching closely…' : 'Ready when you are! Tap Translate video.'}
+                  </div>
+                </div>
+                <p className="mt-5 font-bold text-[0.9375rem]">
                   GestureVoice samples the video, reads each sign in order, and stitches them into sentences.
                   This usually takes under a minute.
                 </p>
               </div>
             ) : (
               <div className="sheet overflow-hidden">
-                <div className="flex items-stretch justify-between gap-4 px-5 h-12 border-b border-rule">
-                  <nav aria-label="Result views" className="flex gap-6">
+                <div className="flex items-center justify-between gap-4 px-4 py-3 border-b-2 border-rule">
+                  <nav aria-label="Result views" className="flex gap-2 overflow-x-auto">
                     {([
                       ['transcript', 'Transcript'],
                       ['timeline', 'By sign'],
@@ -880,7 +889,7 @@ ${translationResult.segments
                           setIsEditingTranscript(false);
                         }}
                         aria-current={activeTab === id || (id === 'transcript' && activeTab === 'editor') ? 'page' : undefined}
-                        className="navlink"
+                        className="chip"
                       >
                         {label}
                       </button>
@@ -891,7 +900,7 @@ ${translationResult.segments
                       <Download className="w-4 h-4" /> Export
                     </button>
                     {exportMenuOpen && (
-                      <ul className="absolute right-0 top-11 z-20 w-52 sheet shadow-xl py-1.5">
+                      <ul className="absolute right-0 top-12 z-20 w-56 sheet border-b-4 py-2">
                         {exports.map(([label, fn]) => (
                           <li key={label}>
                             <button
@@ -899,7 +908,7 @@ ${translationResult.segments
                                 fn();
                                 setExportMenuOpen(false);
                               }}
-                              className="w-full text-left px-4 py-2 text-sm hover:bg-sunk"
+                              className="w-full text-left px-4 py-2.5 text-sm font-bold hover:bg-sunk"
                             >
                               {label}
                             </button>
@@ -912,7 +921,7 @@ ${translationResult.segments
 
                 {(activeTab === 'transcript' || activeTab === 'editor') && (
                   <div className="p-5 sm:p-6">
-                    <p className="text-sm text-ink-3 tnum">
+                    <p className="text-xs font-extrabold uppercase tracking-wider text-ink-3 tnum">
                       {words} words · {confidenceWord[translationResult.confidence] ?? translationResult.confidence}
                     </p>
                     {isEditingTranscript ? (
@@ -925,7 +934,7 @@ ${translationResult.segments
                           value={editedText}
                           onChange={(e) => setEditedText(e.target.value)}
                           rows={8}
-                          className="field !py-3 mt-3 said !text-[1.5rem] leading-snug resize-y"
+                          className="field !py-3 mt-3 said !text-[1.25rem] leading-snug resize-y"
                         />
                         <div className="mt-3 flex gap-2">
                           <button onClick={handleSaveEditedTranscript} className="btn btn-sm btn-ink">
@@ -943,10 +952,10 @@ ${translationResult.segments
                         </div>
                       </>
                     ) : (
-                      <p className="said text-[1.75rem] sm:text-[2rem] leading-[1.2] mt-3 text-ink">{transcriptText}</p>
+                      <p className="said text-[1.5rem] sm:text-[1.75rem] leading-[1.3] mt-3 text-ink">{transcriptText}</p>
                     )}
                     {translationResult.summary && !isEditingTranscript && (
-                      <p className="mt-5 text-[0.9375rem] text-ink-2 border-l-2 border-rule-strong pl-3">{translationResult.summary}</p>
+                      <p className="mt-5 text-[0.9375rem] font-bold text-ink-2 rounded-xl bg-sunk px-4 py-3">{translationResult.summary}</p>
                     )}
                     {!isEditingTranscript && (
                       <div className="mt-6 flex flex-wrap gap-2">
@@ -982,7 +991,7 @@ ${translationResult.segments
 
                 {activeTab === 'timeline' && (
                   <div>
-                    <div className="p-4 border-b border-rule">
+                    <div className="p-4 border-b-2 border-rule">
                       <div className="relative">
                         <Search className="w-4 h-4 text-ink-3 absolute left-3.5 top-1/2 -translate-y-1/2" />
                         <input
@@ -991,7 +1000,7 @@ ${translationResult.segments
                           onChange={(e) => setSearchQuery(e.target.value)}
                           placeholder="Find a word or sign"
                           aria-label="Find a word or sign"
-                          className="field !pl-10 !rounded-full !min-h-10 text-sm"
+                          className="field !pl-10 !min-h-11 text-sm"
                         />
                       </div>
                     </div>
@@ -999,16 +1008,16 @@ ${translationResult.segments
                       {filteredSegments.map((seg) => {
                         const active = translationResult.segments[activeSegmentIndex ?? -1]?.id === seg.id;
                         return (
-                          <li key={seg.id} className="border-b border-rule last:border-0">
+                          <li key={seg.id} className="border-b-2 border-rule last:border-0">
                             <button
                               onClick={() => handlePlaySegmentAudio(seg)}
-                              className={`w-full text-left grid grid-cols-[3.5rem_1fr] gap-3 px-5 py-3.5 border-l-2 transition-colors ${
-                                active ? 'border-signer bg-signer-soft/60' : 'border-transparent hover:bg-sunk/60'
+                              className={`w-full text-left grid grid-cols-[3.5rem_1fr] gap-3 px-5 py-3.5 transition-colors ${
+                                active ? 'bg-partner-soft' : 'hover:bg-sunk'
                               }`}
                             >
-                              <span className="font-mono text-xs text-ink-3 pt-1.5">{fmt(seg.startTime)}</span>
+                              <span className="tnum text-sm font-extrabold text-partner-ink pt-1">{fmt(seg.startTime)}</span>
                               <span>
-                                <span className="said block text-[1.375rem] text-ink">
+                                <span className="said block text-[1.1875rem] text-ink">
                                   {seg.spokenText}
                                   {speakingSegmentId === seg.id && (
                                     <span className="speak-bars ml-2 text-signer align-middle" aria-label="speaking">
@@ -1018,7 +1027,7 @@ ${translationResult.segments
                                     </span>
                                   )}
                                 </span>
-                                <span className="block text-sm text-ink-3 mt-0.5">
+                                <span className="block text-sm font-bold text-ink-3 mt-0.5">
                                   {seg.signName.replace(/_/g, ' ').toLowerCase().replace(/^./, (c) => c.toUpperCase())}
                                   {seg.meaning && !/^ASL sign\b/i.test(seg.meaning) ? ` — ${seg.meaning}` : ''}
                                 </span>
@@ -1039,14 +1048,14 @@ ${translationResult.segments
                     <p className="text-sm text-ink-2">
                       Gloss writes each sign as an English word in capitals, in signing order. It shows what was signed, not how it translates.
                     </p>
-                    <p className="mt-4 font-mono text-[1.0625rem] leading-relaxed tracking-wide text-ink">{translationResult.aslGloss}</p>
+                    <p className="mt-4 rounded-xl bg-sunk px-4 py-3 font-mono text-[1.0625rem] leading-relaxed tracking-wide text-ink">{translationResult.aslGloss}</p>
                     <button onClick={() => navigator.clipboard.writeText(translationResult.aslGloss)} className="btn btn-sm btn-line mt-5">
                       <Copy className="w-4 h-4" /> Copy gloss
                     </button>
                   </div>
                 )}
 
-                <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-3 border-t border-rule bg-paper/50">
+                <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-3 border-t-2 border-rule">
                   <label className="flex items-center gap-2 text-sm text-ink-2">
                     <button role="switch" aria-checked={syncVoiceover} onClick={() => setSyncVoiceover(!syncVoiceover)} className="switch scale-[0.8] origin-left" />
                     Speak along with the video

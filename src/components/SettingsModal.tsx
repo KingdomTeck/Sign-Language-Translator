@@ -18,10 +18,10 @@ const Row: React.FC<{ title: string; hint: string; checked: boolean; onChange: (
   checked,
   onChange,
 }) => (
-  <div className="flex items-center justify-between gap-6 py-4 border-b border-rule">
+  <div className="flex items-center justify-between gap-6 py-4 border-b-2 border-rule">
     <div>
-      <p className="text-[0.9375rem] font-medium text-ink">{title}</p>
-      <p className="text-sm text-ink-3 mt-0.5">{hint}</p>
+      <p className="text-[1rem] font-extrabold text-ink">{title}</p>
+      <p className="text-sm font-bold text-ink-3 mt-0.5">{hint}</p>
     </div>
     <button role="switch" aria-checked={checked} aria-label={title} onClick={onChange} className="switch" />
   </div>
@@ -82,12 +82,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
         role="dialog"
         aria-modal="true"
         aria-labelledby="settings-title"
-        className={`absolute right-0 top-0 h-full w-full max-w-[420px] bg-sheet border-l border-rule flex flex-col outline-none transition-transform duration-200 ease-out ${
+        className={`absolute right-0 top-0 h-full w-full max-w-[420px] bg-sheet border-l-2 border-rule flex flex-col outline-none transition-transform duration-200 ease-out ${
           open ? 'translate-x-0 shadow-2xl' : 'translate-x-full invisible'
         }`}
       >
-        <div className="flex items-center justify-between h-16 pl-6 pr-3 border-b border-rule shrink-0">
-          <h2 id="settings-title" className="text-[1.0625rem] font-semibold">
+        <div className="flex items-center justify-between h-16 pl-6 pr-3 border-b-2 border-rule shrink-0">
+          <h2 id="settings-title" className="text-[1.375rem] font-black">
             Settings
           </h2>
           <button onClick={onClose} className="icon-btn" aria-label="Close settings">
@@ -99,7 +99,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           <h3 className="eyebrow mb-4">Voice</h3>
           <p className="text-sm text-ink-3 -mt-2 mb-4">How your signs sound when spoken aloud.</p>
 
-          <label htmlFor="voice" className="block text-sm font-medium text-ink mb-2">
+          <label htmlFor="voice" className="block text-sm font-extrabold text-ink mb-2">
             Voice
           </label>
           <select
@@ -118,10 +118,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
           <div className="mb-6">
             <div className="flex justify-between text-sm mb-3">
-              <label htmlFor="rate" className="font-medium text-ink">
+              <label htmlFor="rate" className="font-extrabold text-ink">
                 Speed
               </label>
-              <span className="tnum text-ink-2">{voiceSettings.rate.toFixed(2)}×</span>
+              <span className="tnum font-extrabold text-partner-ink">{voiceSettings.rate.toFixed(2)}×</span>
             </div>
             <input
               id="rate"
@@ -141,10 +141,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
           <div className="mb-6">
             <div className="flex justify-between text-sm mb-3">
-              <label htmlFor="pitch" className="font-medium text-ink">
+              <label htmlFor="pitch" className="font-extrabold text-ink">
                 Pitch
               </label>
-              <span className="tnum text-ink-2">{voiceSettings.pitch.toFixed(2)}</span>
+              <span className="tnum font-extrabold text-partner-ink">{voiceSettings.pitch.toFixed(2)}</span>
             </div>
             <input
               id="pitch"
@@ -167,7 +167,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           </button>
 
           <h3 className="eyebrow">Behaviour</h3>
-          <div className="border-t border-rule mt-3">
+          <div className="border-t-2 border-rule mt-3">
             <Row
               title="Speak signs automatically"
               hint="Say each sign as soon as it’s read. Off: tap “Say again” to speak."
@@ -189,7 +189,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           </div>
         </div>
 
-        <div className="px-6 py-4 border-t border-rule shrink-0">
+        <div className="px-6 py-4 border-t-2 border-rule shrink-0">
           <button onClick={handleReset} className="btn btn-sm btn-quiet -ml-3">
             Reset to defaults
           </button>
