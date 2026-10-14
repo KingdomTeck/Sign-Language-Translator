@@ -1,23 +1,13 @@
 import React, { useRef, useState, useEffect, useCallback } from 'react';
 import {
   Camera,
-  CameraOff,
   RefreshCw,
-  Play,
-  Square,
-  Sparkles,
   Volume2,
-  Upload,
-  HelpCircle,
   FlipHorizontal,
-  Image as ImageIcon,
-  MonitorPlay,
-  CheckCircle2,
-  Activity,
-  Layers,
   Eye,
   EyeOff,
-  Sliders,
+  Hand,
+  X,
 } from 'lucide-react';
 import { GestureTranslation, VoiceSettings } from '../types';
 import { speechManager, soundEffects } from '../services/speechSynthesis';
@@ -31,13 +21,6 @@ import {
   RecognizedHandGesture,
   classifyHandLandmarks,
 } from '../services/handTracking';
-import {
-  AnimatedCamera,
-  AnimatedHand,
-  AnimatedRadarScanner,
-  AnimatedSpeaker,
-  AnimatedSparkles,
-} from './AnimatedIcons';
 
 interface CameraTranslatorProps {
   voiceSettings: VoiceSettings;
@@ -129,7 +112,7 @@ const VIRTUAL_SIGNS: VirtualSignModel[] = [
       ctx.translate(320, 240);
       ctx.rotate(waveAngle);
       // Forearm & wrist
-      ctx.fillStyle = '#f59e0b';
+      ctx.fillStyle = '#cdbfa6';
       ctx.beginPath();
       ctx.roundRect(-24, 70, 48, 120, 16);
       ctx.fill();
@@ -166,7 +149,7 @@ const VIRTUAL_SIGNS: VirtualSignModel[] = [
     drawHand: (ctx) => {
       ctx.save();
       ctx.translate(320, 240);
-      ctx.fillStyle = '#f59e0b';
+      ctx.fillStyle = '#cdbfa6';
       // Palm
       ctx.beginPath();
       ctx.roundRect(-38, -25, 76, 100, 22);
@@ -201,7 +184,7 @@ const VIRTUAL_SIGNS: VirtualSignModel[] = [
     drawHand: (ctx) => {
       ctx.save();
       ctx.translate(320, 240);
-      ctx.fillStyle = '#f59e0b';
+      ctx.fillStyle = '#cdbfa6';
       // Palm
       ctx.beginPath();
       ctx.roundRect(-36, -15, 72, 90, 20);
@@ -244,7 +227,7 @@ const VIRTUAL_SIGNS: VirtualSignModel[] = [
     drawHand: (ctx) => {
       ctx.save();
       ctx.translate(320, 240);
-      ctx.fillStyle = '#f59e0b';
+      ctx.fillStyle = '#cdbfa6';
       // Fist body
       ctx.beginPath();
       ctx.roundRect(-40, -15, 80, 80, 22);
@@ -267,13 +250,13 @@ const VIRTUAL_SIGNS: VirtualSignModel[] = [
       const nodOffset = Math.sin(t * 0.007) * 20;
       ctx.save();
       ctx.translate(320, 240 + nodOffset);
-      ctx.fillStyle = '#f59e0b';
+      ctx.fillStyle = '#cdbfa6';
       // Fist
       ctx.beginPath();
       ctx.roundRect(-42, -35, 84, 85, 24);
       ctx.fill();
       // Curled finger lines
-      ctx.strokeStyle = '#d97706';
+      ctx.strokeStyle = '#a8987c';
       ctx.lineWidth = 4;
       ctx.beginPath();
       ctx.moveTo(-35, -5);
@@ -299,7 +282,7 @@ const VIRTUAL_SIGNS: VirtualSignModel[] = [
       const forwardOffset = (Math.sin(t * 0.005) + 1) * 30;
       ctx.save();
       ctx.translate(320, 220 + forwardOffset);
-      ctx.fillStyle = '#f59e0b';
+      ctx.fillStyle = '#cdbfa6';
       // Palm
       ctx.beginPath();
       ctx.roundRect(-36, -30, 72, 90, 20);
@@ -327,7 +310,7 @@ const VIRTUAL_SIGNS: VirtualSignModel[] = [
     drawHand: (ctx) => {
       ctx.save();
       ctx.translate(320, 240);
-      ctx.fillStyle = '#f59e0b';
+      ctx.fillStyle = '#cdbfa6';
       // Palm base
       ctx.beginPath();
       ctx.roundRect(-35, -15, 70, 85, 20);
@@ -339,7 +322,7 @@ const VIRTUAL_SIGNS: VirtualSignModel[] = [
         ctx.fill();
       });
       // Pinched loop (thumb + index)
-      ctx.strokeStyle = '#f59e0b';
+      ctx.strokeStyle = '#cdbfa6';
       ctx.lineWidth = 14;
       ctx.beginPath();
       ctx.arc(-22, -18, 22, 0, Math.PI * 2);
@@ -357,7 +340,7 @@ const VIRTUAL_SIGNS: VirtualSignModel[] = [
     drawHand: (ctx) => {
       ctx.save();
       ctx.translate(320, 240);
-      ctx.fillStyle = '#f59e0b';
+      ctx.fillStyle = '#cdbfa6';
       // Palm
       ctx.beginPath();
       ctx.roundRect(-35, -20, 70, 80, 20);
@@ -387,7 +370,7 @@ const VIRTUAL_SIGNS: VirtualSignModel[] = [
     drawHand: (ctx) => {
       ctx.save();
       ctx.translate(320, 240);
-      ctx.fillStyle = '#f59e0b';
+      ctx.fillStyle = '#cdbfa6';
       // Closed fist base
       ctx.beginPath();
       ctx.roundRect(-36, -20, 72, 85, 22);
@@ -413,7 +396,7 @@ const VIRTUAL_SIGNS: VirtualSignModel[] = [
     drawHand: (ctx) => {
       ctx.save();
       ctx.translate(320, 240);
-      ctx.fillStyle = '#f59e0b';
+      ctx.fillStyle = '#cdbfa6';
       // Palm
       ctx.beginPath();
       ctx.roundRect(-35, -15, 70, 85, 20);
@@ -469,8 +452,8 @@ export const CameraTranslator: React.FC<CameraTranslatorProps> = ({
   const [handTrackingEnabled, setHandTrackingEnabled] = useState<boolean>(true);
   const [showSkeleton, setShowSkeleton] = useState<boolean>(true);
   const [showLandmarkPoints, setShowLandmarkPoints] = useState<boolean>(true);
-  const [showGestureBadge, setShowGestureBadge] = useState<boolean>(true);
-  const [trackingColorTheme, setTrackingColorTheme] = useState<'neonCyan' | 'emerald' | 'amber'>('neonCyan');
+  const [showGestureBadge, setShowGestureBadge] = useState<boolean>(false);
+  const [trackingColorTheme, setTrackingColorTheme] = useState<'neonCyan' | 'emerald' | 'amber'>('emerald');
   const [trackedHandState, setTrackedHandState] = useState<TrackedHand | null>(null);
   const [fpsCounter, setFpsCounter] = useState<number>(30);
   const [trackingLatencyMs, setTrackingLatencyMs] = useState<number>(22);
@@ -665,11 +648,11 @@ export const CameraTranslator: React.FC<CameraTranslatorProps> = ({
       canvas.height = 480;
 
       // Dark virtual studio background
-      ctx.fillStyle = '#090d16';
+      ctx.fillStyle = '#1a1916';
       ctx.fillRect(0, 0, 640, 480);
 
       // Grid guide lines
-      ctx.strokeStyle = '#1e293b';
+      ctx.strokeStyle = '#24221e';
       ctx.lineWidth = 1;
       for (let x = 40; x < 640; x += 40) {
         ctx.beginPath();
@@ -694,7 +677,7 @@ export const CameraTranslator: React.FC<CameraTranslatorProps> = ({
       ctx.font = 'bold 15px ui-sans-serif, system-ui';
       ctx.textAlign = 'center';
       ctx.fillText(
-        `Virtual Simulation: ${signModel.name} (${signModel.icon})`,
+        '',
         320,
         35
       );
@@ -1312,10 +1295,27 @@ export const CameraTranslator: React.FC<CameraTranslatorProps> = ({
   };
 
   const activeGesture = trackedHandState?.gesture;
+  const humanize = (raw: string) => {
+    const base = raw.split('__')[0].replace(/_/g, ' ').trim();
+    return base === base.toUpperCase() ? base.charAt(0) + base.slice(1).toLowerCase() : base;
+  };
+
+  const hasSource = streamActive || isVirtualCamera;
+  const confidenceWord: Record<string, string> = { high: 'Confident', medium: 'Fairly sure', low: 'Unsure' };
+  const handLabel = activeGesture && activeGesture.id !== 'standby' ? humanize(activeGesture.name) : null;
+  const showCaption = latestTranslation?.spokenText && (hasSource || staticPreviewImage);
+
+  let stageStatus: { text: string; tone: 'idle' | 'live' | 'found' } | null = null;
+  if (isProcessingFrame) stageStatus = { text: 'Reading sign…', tone: 'found' };
+  else if (isVirtualCamera) stageStatus = { text: handLabel ? `Simulated hand · ${handLabel}` : 'Simulated hand', tone: 'live' };
+  else if (streamActive)
+    stageStatus = trackedHandState
+      ? { text: handLabel ? `Hand found · ${handLabel}` : 'Hand found', tone: 'found' }
+      : { text: 'Looking for a hand', tone: 'live' };
+  else if (staticPreviewImage) stageStatus = { text: 'Still image', tone: 'idle' };
 
   return (
-    <div className="flex flex-col gap-5 w-full">
-      {/* Hidden processing canvas and file input */}
+    <div className="flex flex-col gap-8 w-full">
       <canvas ref={canvasRef} className="hidden" />
       <input
         type="file"
@@ -1326,582 +1326,300 @@ export const CameraTranslator: React.FC<CameraTranslatorProps> = ({
         className="hidden"
       />
 
-      {/* Main Viewport & Framing Card */}
-      <div className="relative w-full rounded-3xl apple-glass border border-white/[0.08] overflow-hidden shadow-2xl flex flex-col">
-        {/* Top Viewport HUD bar */}
-        <div className="flex items-center justify-between px-4 sm:px-5 py-3 bg-slate-950/80 backdrop-blur-xl border-b border-white/[0.06] text-xs text-slate-300">
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2">
-              <span
-                className={`w-2 h-2 rounded-full ${
-                  streamActive
-                    ? 'bg-emerald-400'
-                    : isVirtualCamera
-                    ? 'bg-indigo-400'
-                    : staticPreviewImage
-                    ? 'bg-amber-400'
-                    : 'bg-slate-600'
-                }`}
-              />
-              <span className="font-semibold text-white tracking-[-0.01em]">
-                {streamActive
-                  ? 'Live Camera'
-                  : isVirtualCamera
-                  ? 'Simulator'
-                  : staticPreviewImage
-                  ? 'Snapshot'
-                  : 'Standby'}
-              </span>
-            </div>
-
-            {/* Unboxed live telemetry & real latency readout */}
-            {(streamActive || isVirtualCamera) && (
-              <div className="hidden sm:flex items-center gap-2 text-xs text-slate-400 font-mono tabular-nums">
-                <span aria-hidden="true" className="text-slate-700">|</span>
-                <span className={trackedHandState ? 'text-emerald-400 font-medium' : 'text-slate-400'}>
-                  {trackedHandState ? 'Hand Locked' : 'Scanning'}
-                </span>
-                <span aria-hidden="true" className="text-slate-700">·</span>
-                <span>{fpsCounter} FPS</span>
-                <span aria-hidden="true" className="text-slate-700">·</span>
-                <span>{trackingLatencyMs}ms tracking</span>
-                {translationLatencyMs !== null && (
-                  <>
-                    <span aria-hidden="true" className="text-slate-700">·</span>
-                    <span className="text-slate-300">{translationLatencyMs}ms translate</span>
-                  </>
-                )}
-              </div>
-            )}
-
-            {practiceFocus && (
-              <div className="flex items-center gap-1.5 text-xs text-amber-300 font-medium">
-                <span aria-hidden="true" className="text-slate-700">|</span>
-                <span>Practicing: {practiceFocus}</span>
-                <button
-                  onClick={clearPracticeFocus}
-                  className="hover:text-white font-bold ml-0.5 cursor-pointer"
-                  title="Clear practice focus"
-                >
-                  ×
-                </button>
-              </div>
-            )}
-          </div>
-
-          {/* Camera & Tracking controls */}
-          <div className="flex items-center gap-1.5">
-            {/* Hand Tracking Toggle */}
-            <button
-              onClick={() => setHandTrackingEnabled((prev) => !prev)}
-              className={`px-2.5 py-1.5 rounded-xl transition-all flex items-center gap-1.5 text-xs font-medium cursor-pointer apple-press ${
-                handTrackingEnabled
-                  ? 'bg-cyan-500/15 text-cyan-300 border border-cyan-500/30 shadow-sm'
-                  : 'text-slate-400 hover:text-white hover:bg-white/[0.06] border border-transparent'
-              }`}
-              title="Toggle Real-Time 21-Landmark Hand Skeleton Tracking"
-            >
-              <Layers className="w-3.5 h-3.5 text-cyan-400" />
-              <span className="hidden md:inline">
-                {handTrackingEnabled ? 'Skeleton ON' : 'Skeleton OFF'}
-              </span>
-            </button>
-
-            {streamActive && (
-              <>
-                <button
-                  onClick={() => setIsMirrored((prev) => !prev)}
-                  className={`p-1.5 rounded transition-colors cursor-pointer ${
-                    isMirrored
-                      ? 'bg-slate-800 text-emerald-400'
-                      : 'text-slate-400 hover:text-white'
-                  }`}
-                  title="Mirror Flip View (Recommended for self-signing)"
-                >
-                  <FlipHorizontal className="w-4 h-4" />
-                </button>
-
-                <button
-                  onClick={() => {
-                    stopCamera();
-                    setFacingMode((prev) => (prev === 'user' ? 'environment' : 'user'));
-                    setTimeout(() => startCamera(), 100);
-                  }}
-                  className="p-1.5 text-slate-400 hover:text-white rounded hover:bg-slate-800 transition-colors cursor-pointer"
-                  title="Switch Front/Back Camera"
-                >
-                  <RefreshCw className="w-4 h-4" />
-                </button>
-              </>
-            )}
-
-            {/* Virtual Camera simulator toggle */}
-            <button
-              onClick={isVirtualCamera ? stopVirtualCamera : startVirtualCamera}
-              className={`p-1.5 rounded transition-colors flex items-center gap-1 text-xs cursor-pointer ${
-                isVirtualCamera
-                  ? 'bg-indigo-950/80 text-indigo-400 border border-indigo-500/40'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800'
-              }`}
-              title="Toggle Virtual Practice Simulator (test without physical camera)"
-            >
-              <MonitorPlay className="w-4 h-4" />
-              <span className="hidden sm:inline">
-                {isVirtualCamera ? 'Virtual Feed On' : 'Simulator'}
-              </span>
-            </button>
-
-            {/* Upload image */}
-            <button
-              onClick={() => fileInputRef.current?.click()}
-              className="p-1.5 text-slate-400 hover:text-white rounded hover:bg-slate-800 transition-colors flex items-center gap-1 text-xs cursor-pointer"
-              title="Upload Gesture Photo"
-            >
-              <Upload className="w-4 h-4 text-indigo-400" />
-              <span className="hidden sm:inline">Upload</span>
-            </button>
-
-            {/* Real Camera On/Off Toggle */}
-            <button
-              onClick={streamActive ? stopCamera : startCamera}
-              disabled={isConnectingCamera}
-              className={`p-1.5 rounded transition-colors cursor-pointer ${
-                streamActive
-                  ? 'text-rose-400 hover:bg-rose-950/50'
-                  : 'text-emerald-400 hover:bg-emerald-950/50'
-              }`}
-              title={streamActive ? 'Turn Off Webcam' : 'Turn On Webcam'}
-            >
-              {streamActive ? (
-                <CameraOff className="w-4 h-4" />
-              ) : (
-                <Camera className="w-4 h-4" />
-              )}
+      <div className="flex flex-col gap-4">
+        {practiceFocus && (
+          <div className="flex items-center justify-between gap-4 pl-4 pr-2 py-2 rounded-xl bg-signer-soft text-ink">
+            <p className="text-[0.9375rem]">
+              Practising <span className="font-semibold">{practiceFocus}</span>. Make the sign, then read it.
+            </p>
+            <button onClick={clearPracticeFocus} className="btn btn-sm btn-quiet">
+              Stop
             </button>
           </div>
-        </div>
+        )}
 
-        {/* Viewfinder Frame */}
-        <div className="relative w-full aspect-[4/3] sm:aspect-[16/10] max-h-[500px] bg-slate-950 flex items-center justify-center overflow-hidden">
-          {/* Real Webcam video element: ALWAYS in DOM */}
+        {/* The stage — always dark, it is a camera */}
+        <figure className="relative m-0 w-full aspect-[4/5] sm:aspect-[16/10] rounded-[20px] overflow-hidden bg-[#161512] text-[#f3efe6]">
           <video
             ref={videoRef}
             autoPlay
             playsInline
             muted
-            className={`w-full h-full object-cover transition-opacity duration-300 ${
-              isMirrored ? 'scale-x-[-1]' : ''
-            } ${streamActive ? 'opacity-100 z-10' : 'opacity-0 pointer-events-none absolute inset-0'}`}
+            className={`w-full h-full object-cover ${isMirrored ? 'scale-x-[-1]' : ''} ${
+              streamActive ? 'opacity-100' : 'opacity-0 pointer-events-none absolute inset-0'
+            }`}
           />
-
-          {/* Virtual Camera Canvas element: Active when simulating */}
           <canvas
             ref={virtualCanvasRef}
-            className={`w-full h-full object-contain ${
-              isVirtualCamera ? 'opacity-100 z-10' : 'hidden'
-            }`}
+            className={`absolute inset-0 w-full h-full object-cover ${isVirtualCamera ? '' : 'hidden'}`}
           />
-
-          {/* Real-time Hand Tracking Skeleton Overlay Canvas */}
           <canvas
             ref={trackingCanvasRef}
-            className={`absolute inset-0 pointer-events-none z-20 w-full h-full object-cover ${
+            className={`absolute inset-0 pointer-events-none w-full h-full object-cover ${
               isMirrored && streamActive ? 'scale-x-[-1]' : ''
-            }`}
+            } ${handTrackingEnabled ? '' : 'invisible'}`}
           />
 
-          {/* Framing Target Box with UIverse Cyber HUD Brackets and Magic UI Border Beam */}
-          {(streamActive || isVirtualCamera) && (
-            <>
-              <div className="uiverse-hud-corner-tl" />
-              <div className="uiverse-hud-corner-tr" />
-              <div className="uiverse-hud-corner-bl" />
-              <div className="uiverse-hud-corner-br" />
-              <div className="absolute inset-8 sm:inset-14 pointer-events-none border-2 border-dashed border-cyan-500/30 rounded-3xl flex flex-col items-center justify-between p-4 z-15 relative overflow-hidden">
-                <div className="magic-border-beam" />
-                <div className="flex items-center justify-between w-full">
-                  <span className="text-[11px] font-mono tracking-wider uppercase text-cyan-400/80 bg-slate-950/85 px-2.5 py-0.5 rounded border border-cyan-500/20">
-                    {isVirtualCamera ? 'Simulated Gesture Feed' : '21-Point Hand Tracking Zone'}
-                  </span>
-                  <div className="flex items-center gap-1.5 px-2 py-0.5 rounded bg-slate-950/85 border border-slate-800 text-[11px] font-mono">
-                    <span
-                      className={`w-2 h-2 rounded-full ${
-                        trackedHandState ? 'bg-cyan-400 animate-ping' : 'bg-amber-400 animate-pulse'
-                      }`}
-                    />
-                    <span className={trackedHandState ? 'text-cyan-300' : 'text-amber-300'}>
-                      {trackedHandState ? 'Hand Tracked' : 'Scanning'}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Circle Loaders Animated Radar Scanner while waiting for hand */}
-                {!trackedHandState && (
-                  <AnimatedRadarScanner size={84} className="my-auto opacity-75" />
-                )}
-
-                <div className="text-[11px] text-slate-300/80 bg-slate-950/85 px-3 py-1 rounded-full border border-slate-800 text-center">
-                  {trackedHandState?.gesture
-                    ? `Recognized: ${trackedHandState.gesture.emoji} ${trackedHandState.gesture.name} • Tap Translate to Speak`
-                    : 'Position hand inside box • 21 Landmarks track in real time'}
-                </div>
-              </div>
-            </>
+          {!hasSource && staticPreviewImage && (
+            <img
+              src={staticPreviewImage}
+              alt="The image being read"
+              className="absolute inset-0 w-full h-full object-contain bg-[#161512]"
+            />
           )}
 
-          {/* Processing overlay */}
-          {isProcessingFrame && (
-            <div className="absolute top-4 right-4 flex items-center gap-2 bg-slate-950/90 border border-emerald-500/50 px-3.5 py-1.5 rounded-xl shadow-lg backdrop-blur-md z-30">
-              <div className="w-3.5 h-3.5 border-2 border-emerald-400 border-t-transparent rounded-full animate-spin" />
-              <span className="text-xs font-medium text-emerald-300">
-                Translating Sign to Voice...
-              </span>
-            </div>
-          )}
-
-          {/* Uploaded or Demo Static Image View */}
-          {!streamActive && !isVirtualCamera && staticPreviewImage && (
-            <div className="relative w-full h-full flex items-center justify-center bg-slate-950 z-10">
-              <img
-                src={staticPreviewImage}
-                alt="Captured Hand Sign"
-                className="max-w-full max-h-full object-contain"
-              />
-              <div className="absolute top-3 left-3 bg-slate-950/80 border border-slate-800 px-3 py-1 rounded-lg text-xs text-slate-300 flex items-center gap-2">
-                <ImageIcon className="w-3.5 h-3.5 text-amber-400" />
-                <span>Uploaded Snapshot Frame</span>
-              </div>
-              <button
-                onClick={startCamera}
-                className="absolute top-3 right-3 px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-medium transition-colors flex items-center gap-1.5 shadow-md cursor-pointer"
+          {/* Idle — the invitation */}
+          {!hasSource && !staticPreviewImage && (
+            <div className="absolute inset-0 flex flex-col justify-end p-6 sm:p-10">
+              <svg
+                className="absolute right-10 top-10 w-36 opacity-[0.18] hidden sm:block"
+                viewBox="0 0 120 140"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                aria-hidden="true"
               >
-                <Camera className="w-3.5 h-3.5" />
-                <span>Switch to Webcam</span>
-              </button>
-            </div>
-          )}
-
-          {/* Camera Standby Screen with Aceternity Ambient Grid */}
-          {!streamActive && !isVirtualCamera && !staticPreviewImage && (
-            <div className="relative w-full h-full flex flex-col items-center justify-center p-8 text-center max-w-lg gap-5 z-10 bg-ambient-grid">
-              <div className="absolute inset-0 bg-radial from-emerald-500/10 via-transparent to-transparent pointer-events-none" />
-              <div className="w-16 h-16 rounded-3xl bg-gradient-to-br from-emerald-500/20 to-sky-500/10 border border-white/15 flex items-center justify-center text-emerald-400 shadow-[0_8px_24px_rgba(16,185,129,0.25)] group hover:scale-105 transition-transform">
-                <AnimatedCamera className="w-8 h-8 text-emerald-400" active={isConnectingCamera} />
-              </div>
-
-              <div>
-                <h3 className="text-lg font-semibold text-white tracking-[-0.02em]">
-                  {isPermissionDenied ? 'Camera Access Required' : 'Ready for ASL & Hand Tracking'}
-                </h3>
-                <p className="text-xs text-slate-300/80 mt-1.5 leading-relaxed">
-                  {isPermissionDenied
-                    ? 'Browser webcam permission was declined. Launch the Virtual Simulator or upload an image to continue.'
-                    : 'Enable your camera for real-time 21-landmark skeletal tracking and voice translation, or explore with the virtual simulator.'}
-                </p>
-              </div>
-
-              {/* Action Buttons with UIverse Glow Styling */}
-              <div className="flex flex-wrap items-center justify-center gap-2.5 w-full">
+                <path d="M38 132 C24 112 18 96 20 82 L22 62 C23 55 32 54 34 61 L37 76 L36 26 C36 18 47 18 47 26 L48 66 L50 14 C50 6 62 6 62 14 L62 64 L65 22 C65 14 77 14 77 22 L76 68 L81 40 C82 32 93 33 92 41 L88 84 C86 106 80 120 72 132" />
+              </svg>
+              <p className="said text-[2.5rem] sm:text-[3.5rem] leading-[1]">Sign, and be heard.</p>
+              <p className="mt-3 max-w-md text-[0.9375rem] text-[#b9b4a6]">
+                Turn on your camera and sign toward it. Each sign is read, spoken aloud, and added to the conversation.
+              </p>
+              <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-3">
                 <button
                   onClick={startCamera}
                   disabled={isConnectingCamera}
-                  className="uiverse-glow-btn px-5 py-2.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-white font-semibold text-xs sm:text-sm transition-all shadow-[0_4px_20px_rgba(16,185,129,0.35)] flex items-center gap-2 cursor-pointer"
+                  className="btn bg-[#f3efe6] text-[#1b1a16] hover:bg-white"
                 >
-                  <AnimatedCamera className="w-4 h-4 text-white" active={isConnectingCamera} />
-                  <span>
-                    {isConnectingCamera ? 'Connecting...' : isPermissionDenied ? 'Retry Camera Access' : 'Enable Camera'}
-                  </span>
+                  <Camera className="w-4 h-4" />
+                  {isConnectingCamera ? 'Starting camera…' : isPermissionDenied ? 'Try camera again' : 'Turn on camera'}
                 </button>
-
-                <button
-                  onClick={startVirtualCamera}
-                  className="uiverse-glow-btn px-4 py-2.5 rounded-2xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white text-xs sm:text-sm font-semibold transition-all shadow-[0_4px_16px_rgba(99,102,241,0.35)] flex items-center gap-2 cursor-pointer"
-                >
-                  <MonitorPlay className="w-4 h-4" />
-                  <span>Virtual Simulator</span>
+                <button onClick={startVirtualCamera} className="text-[0.9375rem] font-medium underline underline-offset-4 decoration-[#5c584e] hover:decoration-current">
+                  Try the simulator
                 </button>
-
-                <button
-                  onClick={() => fileInputRef.current?.click()}
-                  className="px-4 py-2.5 rounded-2xl bg-white/[0.08] hover:bg-white/[0.14] text-white border border-white/[0.1] text-xs sm:text-sm font-medium transition-all flex items-center gap-2 cursor-pointer apple-press"
-                >
-                  <Upload className="w-4 h-4 text-indigo-300" />
-                  <span>Upload Frame</span>
+                <button onClick={() => fileInputRef.current?.click()} className="text-[0.9375rem] font-medium underline underline-offset-4 decoration-[#5c584e] hover:decoration-current">
+                  Use a photo
                 </button>
-
-                {onSwitchToVideoUpload && (
-                  <button
-                    onClick={onSwitchToVideoUpload}
-                    className="px-4 py-2.5 rounded-2xl bg-purple-500/15 hover:bg-purple-500/25 text-purple-200 border border-purple-500/30 text-xs sm:text-sm font-medium transition-all flex items-center gap-2 cursor-pointer apple-press"
-                    title="Upload full video clip and translate to text and voice audio"
-                  >
-                    <Upload className="w-4 h-4 text-purple-300" />
-                    <span>Upload Sign Video</span>
-                  </button>
-                )}
               </div>
-
-              {isPermissionDenied && (
-                <div className="w-full mt-2 p-3.5 rounded-2xl bg-amber-950/30 border border-amber-500/30 text-left text-[11px] text-amber-200/90 leading-relaxed">
-                  <div className="font-semibold text-amber-300 flex items-center gap-1.5 mb-1">
-                    <HelpCircle className="w-3.5 h-3.5" />
-                    <span>To allow webcam in your browser:</span>
-                  </div>
-                  <ol className="list-decimal list-inside space-y-0.5 text-amber-200/80">
-                    <li>Click the lock or site settings icon in the address bar.</li>
-                    <li>Set Camera to &ldquo;Allow&rdquo;.</li>
-                    <li>Click &ldquo;Retry Camera Access&rdquo; above.</li>
-                  </ol>
+              {(cameraError || isPermissionDenied) && (
+                <div className="mt-6 max-w-md text-sm text-[#f0b8a4] border-l-2 border-[#e6936f] pl-3">
+                  {isPermissionDenied ? (
+                    <>
+                      Camera access is blocked. Open the site settings from the lock icon in the address bar,
+                      allow Camera, then try again.
+                    </>
+                  ) : (
+                    cameraError
+                  )}
                 </div>
               )}
             </div>
           )}
-        </div>
 
-        {/* Real-Time Hand Tracking Telemetry & Finger State HUD */}
-        {handTrackingEnabled && (streamActive || isVirtualCamera) && (
-          <div className="px-4 sm:px-5 py-2.5 bg-slate-950/80 border-t border-white/[0.06] flex flex-wrap items-center justify-between gap-3 text-xs">
-            {/* Left: Active Recognized Sign Badge */}
-            <div className="flex items-center gap-2">
-              <span className="text-slate-400 flex items-center gap-1.5 font-medium text-[11px]">
-                <Activity className="w-3.5 h-3.5 text-cyan-400" />
-                <span>Live Gesture:</span>
+          {/* Status, top-left */}
+          {stageStatus && (
+            <div className="absolute top-0 inset-x-0 flex items-start justify-between p-3 sm:p-4 bg-gradient-to-b from-black/45 to-transparent">
+              <span className="inline-flex items-center gap-2 text-sm font-medium">
+                <span
+                  className={stageStatus.tone === 'idle' ? 'w-2 h-2 rounded-full bg-[#868174]' : 'live-dot'}
+                  style={{ color: stageStatus.tone === 'found' ? '#7cc1a0' : '#f3efe6' }}
+                  aria-hidden="true"
+                />
+                <span aria-live="polite">{stageStatus.text}</span>
               </span>
-              {activeGesture && activeGesture.id !== 'standby' ? (
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-500/15 border border-cyan-500/30 text-cyan-200 font-semibold shadow-sm animate-pulse">
-                  <span>{activeGesture.emoji}</span>
-                  <span>{activeGesture.name}</span>
-                  <span className="text-cyan-400 text-[10px] font-mono">
-                    ({Math.round(activeGesture.confidenceScore * 100)}%)
-                  </span>
-                </span>
-              ) : (
-                <span className="text-slate-400 text-xs">Position hand in view...</span>
-              )}
+              <div className="flex items-center gap-0.5">
+                {streamActive && (
+                  <>
+                    <button
+                      onClick={() => setIsMirrored((p) => !p)}
+                      className="w-9 h-9 inline-flex items-center justify-center rounded-full hover:bg-white/15"
+                      aria-label="Mirror preview"
+                      title="Mirror preview"
+                    >
+                      <FlipHorizontal className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => {
+                        stopCamera();
+                        setFacingMode((prev) => (prev === 'user' ? 'environment' : 'user'));
+                        setTimeout(() => startCamera(), 100);
+                      }}
+                      className="w-9 h-9 inline-flex items-center justify-center rounded-full hover:bg-white/15"
+                      aria-label="Switch camera"
+                      title={facingMode === 'user' ? 'Use back camera' : 'Use front camera'}
+                    >
+                      <RefreshCw className="w-4 h-4" />
+                    </button>
+                  </>
+                )}
+                {hasSource && (
+                  <button
+                    onClick={() => setHandTrackingEnabled((p) => !p)}
+                    className="w-9 h-9 inline-flex items-center justify-center rounded-full hover:bg-white/15"
+                    aria-pressed={handTrackingEnabled}
+                    aria-label={handTrackingEnabled ? 'Hide hand outline' : 'Show hand outline'}
+                    title={handTrackingEnabled ? 'Hide hand outline' : 'Show hand outline'}
+                  >
+                    {handTrackingEnabled ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+                  </button>
+                )}
+                {(hasSource || staticPreviewImage) && (
+                  <button
+                    onClick={() => {
+                      stopCamera();
+                      stopVirtualCamera();
+                      setIsTranslatingContinuous(false);
+                      setStaticPreviewImage(null);
+                      setLatestTranslation(null);
+                    }}
+                    className="ml-1 h-9 px-3 inline-flex items-center gap-1.5 rounded-full text-sm font-medium bg-white/10 hover:bg-white/20"
+                  >
+                    <X className="w-4 h-4" /> {streamActive ? 'Camera off' : 'Close'}
+                  </button>
+                )}
+              </div>
             </div>
+          )}
 
-            {/* Right: Skeleton display toggles */}
-            <div className="flex items-center gap-1.5">
-              <button
-                onClick={() => setShowSkeleton((prev) => !prev)}
-                className={`px-2.5 py-1 rounded-xl text-[11px] font-medium transition-all cursor-pointer apple-press ${
-                  showSkeleton
-                    ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30'
-                    : 'text-slate-400 hover:text-slate-200 hover:bg-white/[0.04]'
-                }`}
-                title="Toggle Skeleton Bones"
-              >
-                Bones: {showSkeleton ? 'ON' : 'OFF'}
-              </button>
-              <button
-                onClick={() => setShowLandmarkPoints((prev) => !prev)}
-                className={`px-2.5 py-1 rounded-xl text-[11px] font-medium transition-all cursor-pointer apple-press ${
-                  showLandmarkPoints
-                    ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30'
-                    : 'text-slate-400 hover:text-slate-200 hover:bg-white/[0.04]'
-                }`}
-                title="Toggle 21 Landmark Nodes"
-              >
-                Nodes: {showLandmarkPoints ? 'ON' : 'OFF'}
-              </button>
-              <button
-                onClick={() =>
-                  setTrackingColorTheme((prev) =>
-                    prev === 'neonCyan' ? 'emerald' : prev === 'emerald' ? 'amber' : 'neonCyan'
-                  )
-                }
-                className="px-2.5 py-1 rounded-xl text-[11px] bg-white/[0.06] hover:bg-white/[0.1] text-slate-300 border border-white/[0.08] cursor-pointer capitalize apple-press"
-                title="Change Skeleton Neon Theme"
-              >
-                Theme: {trackingColorTheme}
-              </button>
-            </div>
-          </div>
-        )}
+          {/* Caption — the camera literally subtitles the signer */}
+          {showCaption && (
+            <figcaption
+              key={latestTranslation!.timestamp}
+              className="arrive absolute bottom-0 inset-x-0 px-4 sm:px-6 pt-16 pb-5 bg-gradient-to-t from-black/75 via-black/40 to-transparent"
+            >
+              <p className="said text-[1.75rem] sm:text-[2.25rem] leading-[1.1] max-w-[24ch]">
+                {latestTranslation!.spokenText}
+              </p>
+            </figcaption>
+          )}
 
-        {/* Translation Execution Controls Bar */}
-        <div className="p-4 sm:p-5 bg-slate-950/70 backdrop-blur-xl border-t border-white/[0.06] flex flex-wrap items-center justify-between gap-3">
+          {isProcessingFrame && <div className="reading-line" aria-hidden="true" />}
+        </figure>
+
+        {/* Controls */}
+        <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3">
           <div className="flex items-center gap-3">
-            {/* Primary Manual Trigger */}
             <button
               onClick={performManualTranslation}
-              disabled={(!streamActive && !isVirtualCamera && !staticPreviewImage) || isProcessingFrame}
-              className="flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-white font-semibold text-xs sm:text-sm transition-all shadow-[0_4px_16px_rgba(16,185,129,0.35)] disabled:opacity-40 cursor-pointer apple-press"
+              disabled={!hasSource || isProcessingFrame}
+              className="btn btn-signer !min-h-12 !px-6 text-base"
             >
-              <Sparkles className="w-4 h-4 text-amber-200" />
-              <span>Translate Sign to Voice</span>
+              <Hand className="w-[18px] h-[18px]" />
+              {isProcessingFrame ? 'Reading…' : 'Read sign'}
             </button>
-
-            {/* Continuous Auto-Detect Toggle */}
-            <button
-              onClick={() => setIsTranslatingContinuous((prev) => !prev)}
-              disabled={!streamActive && !isVirtualCamera}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl font-semibold text-xs sm:text-sm transition-all cursor-pointer apple-press ${
-                isTranslatingContinuous
-                  ? 'bg-amber-400 text-slate-950 shadow-[0_2px_12px_rgba(251,191,36,0.35)]'
-                  : 'bg-white/[0.06] hover:bg-white/[0.12] text-slate-200 border border-white/[0.08]'
-              } disabled:opacity-40 disabled:cursor-not-allowed`}
-            >
-              {isTranslatingContinuous ? (
-                <>
-                  <Square className="w-3.5 h-3.5 fill-slate-950" />
-                  <span>Stop Loop</span>
-                </>
-              ) : (
-                <>
-                  <Play className="w-3.5 h-3.5 fill-current text-slate-300" />
-                  <span>Auto-Detect</span>
-                </>
-              )}
-            </button>
+            {latestTranslation?.spokenText && (
+              <button
+                onClick={() => speechManager.speak(latestTranslation.spokenText, voiceSettings)}
+                className="btn btn-line"
+                aria-label="Say the last sign again"
+              >
+                <Volume2 className="w-4 h-4" /> Say again
+              </button>
+            )}
           </div>
 
-          <div className="flex items-center gap-2.5 text-xs text-slate-400">
-            <span className="font-medium text-slate-300">
-              {isTranslatingContinuous ? 'Continuous Auto Loop' : 'Instant Snapshot'}
-            </span>
-            <span aria-hidden="true" className="text-slate-600">·</span>
-            <span className={voiceSettings.autoSpeak ? 'text-emerald-400 font-medium' : 'text-slate-400'}>
-              {voiceSettings.autoSpeak ? 'Auto-Voice Active' : 'Tap to Voice'}
-            </span>
+          <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3 w-full sm:w-auto">
+            {isVirtualCamera && (
+              <label className="flex items-center gap-2 text-sm text-ink-2">
+                Simulate
+                <select
+                  value={selectedVirtualSign}
+                  onChange={(e) => setSelectedVirtualSign(e.target.value)}
+                  className="field !min-h-9 !w-auto !py-0 !pl-3 !pr-8 text-sm"
+                >
+                  {VIRTUAL_SIGNS.map((s) => (
+                    <option key={s.id} value={s.id}>
+                      {s.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            )}
+            <label className={`flex items-center gap-3 ${hasSource ? '' : 'opacity-45'}`}>
+              <span className="leading-tight">
+                <span className="block text-sm font-medium text-ink">Keep reading</span>
+                <span className="block text-xs text-ink-3">every 4 seconds</span>
+              </span>
+              <button
+                role="switch"
+                aria-checked={isTranslatingContinuous}
+                aria-label="Keep reading signs automatically"
+                disabled={!hasSource}
+                onClick={() => setIsTranslatingContinuous((p) => !p)}
+                className="switch"
+              />
+            </label>
           </div>
         </div>
+
+        {latestTranslation && (latestTranslation.description || latestTranslation.aslTip || !latestTranslation.detected) && (
+          <div className="text-[0.9375rem] text-ink-2 border-l-2 border-rule-strong pl-4 space-y-1">
+            {latestTranslation.detected && latestTranslation.gestureName !== 'QUICK_SPEECH' && (
+              <p className="text-sm text-ink-3">
+                Read as <span className="text-ink font-medium">{humanize(latestTranslation.gestureName)}</span>
+                {' · '}
+                {confidenceWord[latestTranslation.confidence] ?? latestTranslation.confidence}
+                {translationLatencyMs ? <span className="tnum"> · {(translationLatencyMs / 1000).toFixed(1)}s</span> : null}
+              </p>
+            )}
+            {!latestTranslation.detected && <p>No sign recognised. Keep your hand inside the frame and try again.</p>}
+            {latestTranslation.aslTip && (
+              <p>
+                <span className="font-medium text-ink">Tip</span> — {latestTranslation.aslTip}
+              </p>
+            )}
+          </div>
+        )}
       </div>
 
-      {/* Instant Demo Gestures (Quick-Test Signs) */}
-      <div className="w-full flex flex-col gap-2.5 p-4 sm:p-5 rounded-3xl apple-glass-card border border-white/[0.08]">
-        <div className="flex items-center justify-between text-xs">
-          <span className="font-semibold text-white tracking-[-0.01em] flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-amber-400" />
-            <span>Interactive Sign Demos (Instant Test)</span>
-          </span>
-          <span className="text-[11px] text-slate-400 hidden sm:inline">
-            Tap any sign to inspect 21 landmarks and speak
-          </span>
+      {/* Phrases the signer can say instantly */}
+      <section aria-labelledby="quick-phrases">
+        <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 mb-3">
+          <h3 id="quick-phrases" className="eyebrow">Say it now</h3>
+          <span className="text-xs text-ink-3">Spoken immediately, no signing needed</span>
         </div>
+        <ul className="grid grid-cols-1 sm:grid-cols-2 border-t border-rule">
+          {QUICK_EMERGENCY_PHRASES.map((phrase, idx) => (
+            <li key={idx} className="border-b border-rule sm:odd:border-r sm:odd:pr-4 sm:even:pl-4">
+              <button
+                onClick={() => handleQuickSpeak(phrase.text)}
+                className="group w-full flex items-center justify-between gap-3 py-3 text-left"
+                title={phrase.text}
+              >
+                <span className="text-[0.9375rem] text-ink group-hover:text-signer transition-colors">
+                  {phrase.label}
+                </span>
+                <Volume2 className="w-4 h-4 text-ink-3 opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100 transition-opacity shrink-0" />
+              </button>
+            </li>
+          ))}
+        </ul>
+      </section>
 
-        <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 sm:gap-2.5">
+      {/* Sample signs — for trying it without a camera */}
+      <section aria-labelledby="samples">
+        <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 mb-3">
+          <h3 id="samples" className="eyebrow">No camera? Read a sample</h3>
+          {onSwitchToVideoUpload && (
+            <button onClick={onSwitchToVideoUpload} className="text-sm text-ink-2 hover:text-ink underline underline-offset-4 decoration-rule-strong">
+              Translate a video instead
+            </button>
+          )}
+        </div>
+        <div className="flex flex-wrap gap-2">
           {SAMPLE_GESTURES.map((sample) => (
             <button
               key={sample.id}
               onClick={() => handleSelectSampleGesture(sample)}
-              className="flex flex-col items-center p-3 rounded-2xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.06] hover:border-cyan-500/40 transition-all text-center group apple-press cursor-pointer shadow-sm"
-              title={`Test ${sample.name} translation`}
+              className="btn btn-sm btn-line !font-medium"
+              title={sample.description}
             >
-              <span className="text-2xl mb-1 group-hover:scale-110 transition-transform">{sample.icon}</span>
-              <span className="text-[11px] font-medium text-slate-200 group-hover:text-cyan-300 line-clamp-1">
-                {sample.name}
-              </span>
+              {sample.name}
             </button>
           ))}
         </div>
-      </div>
-
-      {/* Live Translated Speech Card (Liquid Glass + CSS Text Shimmer) */}
-      <div
-        className={`w-full rounded-3xl p-6 sm:p-7 border transition-all duration-200 relative overflow-hidden ${
-          latestTranslation?.detected
-            ? 'liquid-glass-card uiverse-edge-sheen border-emerald-500/40 shadow-[0_8px_32px_rgba(16,185,129,0.2)]'
-            : 'liquid-glass-card border-white/[0.08]'
-        }`}
-      >
-        <div className="absolute top-0 right-0 w-48 h-48 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="flex items-start justify-between gap-5 relative z-10">
-          <div className="flex flex-col gap-2 flex-1">
-            <div className="flex items-center gap-2 text-xs">
-              <span className="font-semibold text-emerald-400 uppercase tracking-wider text-[11px]">
-                {latestTranslation?.detected ? 'Vocalized Output' : 'Translator Standby'}
-              </span>
-              {latestTranslation?.gestureName && (
-                <>
-                  <span aria-hidden="true" className="text-slate-600">·</span>
-                  <span className="font-mono text-emerald-300 font-medium text-xs">
-                    {latestTranslation.gestureName}
-                  </span>
-                </>
-              )}
-              {latestTranslation?.confidence && (
-                <>
-                  <span aria-hidden="true" className="text-slate-600">·</span>
-                  <span
-                    className={`text-xs font-medium capitalize ${
-                      latestTranslation.confidence === 'high'
-                        ? 'text-emerald-400'
-                        : latestTranslation.confidence === 'medium'
-                        ? 'text-amber-400'
-                        : 'text-slate-400'
-                    }`}
-                  >
-                    {latestTranslation.confidence} Confidence
-                  </span>
-                </>
-              )}
-            </div>
-
-            {latestTranslation?.spokenText ? (
-              <h2 className="text-2xl sm:text-3xl font-bold text-shimmer tracking-tight leading-snug">
-                &ldquo;{latestTranslation.spokenText}&rdquo;
-              </h2>
-            ) : (
-              <p className="text-slate-400 text-sm">
-                Sign in front of the camera, or choose a demo sign above to translate into voice.
-              </p>
-            )}
-
-            {latestTranslation?.description && (
-              <p className="text-xs text-slate-300/80 mt-1">
-                <span className="text-slate-400">Analysis: </span>
-                {latestTranslation.description}
-              </p>
-            )}
-            {latestTranslation?.aslTip && (
-              <p className="text-xs text-amber-300 mt-1">
-                <span className="font-semibold text-amber-400">Tip:</span> {latestTranslation.aslTip}
-              </p>
-            )}
-          </div>
-
-          {latestTranslation?.spokenText && (
-            <button
-              onClick={() => {
-                if (latestTranslation.spokenText) {
-                  speechManager.speak(latestTranslation.spokenText, voiceSettings);
-                }
-              }}
-              className="uiverse-glow-btn w-13 h-13 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white shadow-[0_4px_16px_rgba(16,185,129,0.35)] flex items-center justify-center shrink-0 cursor-pointer apple-press transition-all"
-              title="Speak phrase aloud through device speakers"
-              aria-label="Replay speech"
-            >
-              <AnimatedSpeaker className="w-6 h-6 text-white" active={true} />
-            </button>
-          )}
-        </div>
-      </div>
-
-      {/* Quick Emergency & Conversational Phrases */}
-      <div className="w-full flex flex-col gap-2.5">
-        <div className="flex items-center justify-between text-xs text-slate-400 px-1">
-          <span className="font-semibold text-slate-300 uppercase tracking-wider text-[11px]">
-            Signer Speech Shortcuts
-          </span>
-          <span className="text-[11px]">Instant 1-tap vocalization</span>
-        </div>
-
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-          {QUICK_EMERGENCY_PHRASES.map((phrase, idx) => (
-            <button
-              key={idx}
-              onClick={() => handleQuickSpeak(phrase.text)}
-              className="flex items-center gap-2.5 p-3 rounded-2xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.06] text-left transition-all apple-press group cursor-pointer shadow-sm"
-            >
-              <span className="text-lg shrink-0">{phrase.icon}</span>
-              <span className="text-xs font-semibold text-slate-200 group-hover:text-white line-clamp-1">
-                {phrase.label}
-              </span>
-            </button>
-          ))}
-        </div>
-      </div>
+      </section>
     </div>
   );
 };
