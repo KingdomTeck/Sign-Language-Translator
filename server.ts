@@ -43,7 +43,7 @@ if (fs.existsSync(wasmDir)) {
   );
 }
 
-app.get('/api/health', (_req: Request, res: Response) => {
+app.get(['/api/health', '/health'], (_req: Request, res: Response) => {
   res.json({
     status: 'ok',
     hasKey: Boolean(apiKey),
@@ -387,7 +387,7 @@ function classifyGestureResilient({
   };
 }
 
-app.post('/api/translate-gesture', async (req: Request, res: Response) => {
+app.post(['/api/translate-gesture', '/translate-gesture'], async (req: Request, res: Response) => {
   try {
     const { image, previousGestures, mode, focus, demoId, visionMetrics, handTracking } = req.body;
 
@@ -604,7 +604,7 @@ ${focusInstruction}
   }
 });
 
-app.post('/api/translate-video', async (req: Request, res: Response) => {
+app.post(['/api/translate-video', '/translate-video'], async (req: Request, res: Response) => {
   try {
     const { frames, videoDuration, fileName, detectedSegments } = req.body;
     const duration = typeof videoDuration === 'number' && videoDuration > 0 ? videoDuration : 10;
@@ -925,7 +925,13 @@ async function startServer() {
   });
 }
 
-startServer().catch((err) => {
-  console.error('[GestureVoice] Failed to start server:', err);
-  process.exit(1);
-});
+// When imported as a Vercel serverless function or module, do not bind port with listen()
+if (!process.env.VERCEL && !process.env.AWS_LAMBDA_FUNCTION_NAME) {
+  startServer().catch((err) => {
+    console.error('[GestureVoice] Failed to start server:', err);
+    process.exit(1);
+  });
+}
+
+export default app;
+export { app };

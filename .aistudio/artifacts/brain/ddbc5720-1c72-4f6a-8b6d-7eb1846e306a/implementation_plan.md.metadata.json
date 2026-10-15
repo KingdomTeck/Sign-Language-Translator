@@ -1,6 +1,6 @@
 {
-  "summary": "Implementation plan for GestureVoice, a real-time two-way sign language and hand gesture translator that converts continuous gestures into voice and transcribes spoken responses into readable sign cues.",
-  "updatedAt": "2026-10-07T06:13:11.263079483Z",
+  "summary": "Vercel Deployment Architecture Plan for GestureVoice: details the serverless Express API adapter (api/index.ts), vercel.json build & routing rules, static asset handling (MediaPipe WASM & Vite dist), environment variable configuration for GEMINI_API_KEY, and GitHub push-to-deploy workflow.",
+  "updatedAt": "2026-10-15T09:34:05.692035933Z",
   "requestFeedback": true,
   "userFacing": true
 }
