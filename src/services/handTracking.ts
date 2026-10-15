@@ -821,9 +821,17 @@ class HandTrackingEngine {
       // Dynamic import to keep Vite bundle snappy
       const { FilesetResolver, HandLandmarker } = await import('@mediapipe/tasks-vision');
 
-      const vision = await FilesetResolver.forVisionTasks(
-        'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm'
-      );
+      // Use local bundled WASM binaries matching @mediapipe/tasks-vision@1.1.1 exactly
+      // to avoid CDN Emscripten version drift (LinkError: function import requires a callable)
+      let vision;
+      try {
+        vision = await FilesetResolver.forVisionTasks('/wasm');
+      } catch (localErr) {
+        console.warn('[HandTracker] Local wasm resolution fallback to pinned 1.1.1 CDN:', localErr);
+        vision = await FilesetResolver.forVisionTasks(
+          'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@1.1.1/wasm'
+        );
+      }
 
       const modelUrl =
         'https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task';

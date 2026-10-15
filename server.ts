@@ -27,6 +27,22 @@ const ai = new GoogleGenAI({
   },
 });
 
+// Explicitly serve local MediaPipe WASM binaries with the required application/wasm content-type
+const wasmDir = path.join(__dirname, 'public/wasm');
+if (fs.existsSync(wasmDir)) {
+  app.use(
+    '/wasm',
+    express.static(wasmDir, {
+      setHeaders: (res, filePath) => {
+        if (filePath.endsWith('.wasm')) {
+          res.setHeader('Content-Type', 'application/wasm');
+        }
+        res.setHeader('Access-Control-Allow-Origin', '*');
+      },
+    })
+  );
+}
+
 app.get('/api/health', (_req: Request, res: Response) => {
   res.json({
     status: 'ok',
